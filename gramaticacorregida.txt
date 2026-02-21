@@ -1,0 +1,77 @@
+grammar calculoCientificoToC;
+
+prg : 'PROGRAM' IDENT ';' dcllist cabecera sentlist 'END' 'PROGRAM' IDENT subproglist;
+
+dcllist : dcl dcllist | ;
+
+cabecera : 'INTERFACE' cablist 'END' 'INTERFACE' | ;
+cablist : decproc decsubprog | decfun decsubprog;
+decsubprog : decproc decsubprog | decfun decsubprog | ;
+sentlist : sent sentlist_AUX;
+sentlist_AUX : sent sentlist_AUX | ;
+
+dcl : defcte | defvar;
+defcte : tipo ',' 'PARAMETER' '::' IDENT '=' simpvalue ctelist ';' ;
+ctelist : ',' IDENT '=' simpvalue ctelist | ;
+simpvalue : NUM_INT_CONST | NUM_REAL_CONST | STRING_CONST;
+defvar : tipo '::' varlist ';' ;
+
+tipo : 'INTEGER' | 'REAL' | 'CHARACTER' charlength;
+charlength : '(' NUM_INT_CONST ')' | ;
+varlist : IDENT init varlist_AUX;
+
+varlist_AUX : ',' IDENT init varlist_AUX | ;
+
+init : '=' simpvalue | ;
+
+decproc : 'SUBROUTINE' IDENT formal_paramlist dec_s_paramlist 'END' 'SUBROUTINE' IDENT;
+
+formal_paramlist : '(' nomparamlist ')' | ;
+
+nomparamlist : IDENT nomparamlist_AUX;
+
+nomparamlist_AUX : ',' IDENT nomparamlist_AUX | ;
+
+dec_s_paramlist : tipo ',' 'INTENT' '(' tipoparam ')' IDENT ';' dec_s_paramlist | ;
+
+tipoparam : 'IN' | 'OUT' | 'INOUT';
+
+decfun : 'FUNCTION' IDENT '(' nomparamlist ')' tipo '::' IDENT ';' dec_f_paramlist 'END' 'FUNCTION' IDENT;
+
+dec_f_paramlist : tipo ',' 'INTENT' '(' 'IN' ')' IDENT ';' dec_f_paramlist | ;
+
+sent : IDENT sent_tail | proc_call ';';
+
+sent_tail : '=' exp ';' | ;
+
+exp : factor exp_AUX;
+
+exp_AUX : op factor exp_AUX | ;
+
+op : '+' | '-' | '*' | '/';
+
+factor : simpvalue | '(' exp ')' | IDENT factor_tail;
+
+factor_tail : '(' exp explist ')' | ;
+
+explist : ',' exp explist | ;
+
+proc_call : 'CALL' IDENT subpparamlist;
+
+subpparamlist : '(' exp explist ')' | ;
+
+subproglist : codproc subproglist | codfun subproglist | ;
+
+codproc : 'SUBROUTINE' IDENT formal_paramlist dec_s_paramlist dcllist sentlist 'END' 'SUBROUTINE' IDENT;
+
+codfun : 'FUNCTION' IDENT '(' nomparamlist ')' tipo '::' IDENT ';' dec_f_paramlist dcllist sentlist IDENT '=' exp ';' 'END' 'FUNCTION' IDENT;
+
+
+
+REGLAS CON RECURSION A LA IZQUIERDA corregida:
+-sentlist
+-varlist
+-nomparamlist
+-dec_f_paramlist
+-exp
+-dcl,defcte,defvar

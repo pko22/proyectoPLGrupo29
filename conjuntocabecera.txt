@@ -1,0 +1,46 @@
+
+
+CABECERAS()------------------------------------------
+
+CAB(prg) = {PROGRAM}
+CAB(dcllist) = CAB'(cdl) U  {λ}= {}
+CAB(cabecera) = {INTERFACE, λ}
+CAB(cablist) = CAB'{decproc} U CAB'{decfun}
+CAB(decsubprog) = CAB'{decproc} U CAB'{decfun} U {λ}
+
+
+CAB(sentlist) = CAB'{sentlist}
+
+CAB(dcl) = CAB'{defcte} U CAB'{defvar}
+CAB(defcte) = CAB'{tipo} U {λ}
+
+CAB(ctelist) =  {",",λ}
+
+CAB(simpvalue) = {NUM_INT_CONST,NUM_REAL_CONST,STRING_CONST}
+
+CAB(defvar) = CAB'{tipo} U {λ}
+
+CAB(tipo) = {INTEGER,REAL,CHARACTER}
+CAB(charlength) ={(,λ}
+CAB(varlist) = CAB'{varlist} U {IDENTIFIER}
+
+
+CAB(init) ={=,λ}
+CAB(decproc) = {SUBROUTINE}
+
+
+CAB(formal_paramlist) = {(,λ}
+
+
+CAB(decproc) = CAB'{decproc} U CAB'{decfun}
+CAB(decproc) = CAB'{decproc} U CAB'{decfun}
+CAB(decproc) = CAB'{decproc} U CAB'{decfun}
+CAB(decproc) = CAB'{decproc} U CAB'{decfun}
+CAB(decproc) = CAB'{decproc} U CAB'{decfun}
+CAB(decproc) = CAB'{decproc} U CAB'{decfun}
+CAB(decproc) = CAB'{decproc} U CAB'{decfun}
+CAB(decproc) = CAB'{decproc} U CAB'{decfun}
+
+
+
+
