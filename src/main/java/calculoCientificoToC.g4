@@ -48,9 +48,9 @@ decfun : 'FUNCTION' IDENT '(' nomparamlist ')' tipo '::' IDENT ';' dec_f_paramli
 
 dec_f_paramlist : tipo ',' 'INTENT' '(' 'IN' ')' IDENT ';' dec_f_paramlist | ;
 
-sent : IDENT sent_tail | proc_call ';';
+sent : IDENT sent_AUX | proc_call ';';
 
-sent_tail : '=' exp ';' | ;
+sent_AUX : '=' exp ';' | ;
 
 exp : factor exp_AUX;
 
@@ -58,9 +58,9 @@ exp_AUX : op factor exp_AUX | ;
 
 op : '+' | '-' | '*' | '/';
 
-factor : simpvalue | '(' exp ')' | IDENT factor_tail;
+factor : simpvalue | '(' exp ')' | IDENT factor_AUX;
 
-factor_tail : '(' exp explist ')' | ;
+factor_AUX: '(' exp explist ')' | ;
 
 explist : ',' exp explist | ;
 
