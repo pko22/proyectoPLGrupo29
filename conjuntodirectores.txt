@@ -1,0 +1,74 @@
+DIRECTORES()------------------------------------------
+DIR->P1: prg -> 'PROGRAM' IDENT ';' dcllist cabecera sentlist 'END' 'PROGRAM' IDENT subproglist: {PROGRAM}
+DIR->P2: dcllist -> dcl dcllist: {INTEGER, REAL, CHARACTER}
+DIR->P3: dcllist -> λ: {INTERFACE, IDENT, CALL, END}
+DIR->P4: cabecera -> 'INTERFACE' cablist 'END' 'INTERFACE': {INTERFACE}
+DIR->P5: cabecera -> λ: {IDENT, CALL, END}
+DIR->P6: cablist -> decproc decsubprog: {SUBROUTINE}
+DIR->P7: cablist -> decfun decsubprog: {FUNCTION}
+DIR->P8: decsubprog -> decproc decsubprog: {SUBROUTINE}
+DIR->P9: decsubprog -> decfun decsubprog: {FUNCTION}
+DIR->P10: decsubprog -> λ: {END}
+DIR->P11: sentlist -> sent sentlist_AUX: {IDENT, CALL}
+DIR->P12: sentlist_AUX -> sent sentlist_AUX: {IDENT, CALL}
+DIR->P13: sentlist_AUX -> λ: {END, IDENT}
+DIR->P14: dcl -> defcte: {INTEGER, REAL, CHARACTER}
+DIR->P15: dcl -> defvar: {INTEGER, REAL, CHARACTER}
+DIR->P16: defcte -> tipo ',' 'PARAMETER' '::' IDENT '=' simpvalue ctelist ';': {INTEGER, REAL, CHARACTER}
+DIR->P17: ctelist -> ',' IDENT '=' simpvalue ctelist: {","}
+DIR->P18: ctelist -> λ: {;}
+DIR->P19: simpvalue -> NUM_INT_CONST: {NUM_INT_CONST}
+DIR->P20: simpvalue -> NUM_REAL_CONST: {NUM_REAL_CONST}
+DIR->P21: simpvalue -> STRING_CONST: {STRING_CONST}
+DIR->P22: defvar -> tipo '::' varlist ';': {INTEGER, REAL, CHARACTER}
+DIR->P23: tipo -> 'INTEGER': {INTEGER}
+DIR->P24: tipo -> 'REAL': {REAL}
+DIR->P25: tipo -> 'CHARACTER' charlength: {CHARACTER}
+DIR->P26: charlength -> '(' NUM_INT_CONST ')': {(}
+DIR->P27: charlength -> λ: {",", ::}
+DIR->P28: varlist -> IDENT init varlist_AUX: {IDENT}
+DIR->P29: varlist_AUX -> ',' IDENT init varlist_AUX: {","}
+DIR->P30: varlist_AUX -> λ: {;}
+DIR->P31: init -> '=' simpvalue: {=}
+DIR->P32: init -> λ: {",", ;}
+DIR->P33: decproc -> 'SUBROUTINE' IDENT formal_paramlist dec_s_paramlist 'END' 'SUBROUTINE' IDENT: {SUBROUTINE}
+DIR->P34: formal_paramlist -> '(' nomparamlist ')': {(}
+DIR->P35: formal_paramlist -> λ: {INTEGER, REAL, CHARACTER, END, IDENT, CALL}
+DIR->P36: nomparamlist -> IDENT nomparamlist_AUX: {IDENT}
+DIR->P37: nomparamlist_AUX -> ',' IDENT nomparamlist_AUX: {","}
+DIR->P38: nomparamlist_AUX -> λ: {)}
+DIR->P39: dec_s_paramlist -> tipo ',' 'INTENT' '(' tipoparam ')' IDENT ';' dec_s_paramlist: {INTEGER, REAL, CHARACTER}
+DIR->P40: dec_s_paramlist -> λ: {END, INTEGER, REAL, CHARACTER, IDENT, CALL}
+DIR->P41: tipoparam -> 'IN': {IN}
+DIR->P42: tipoparam -> 'OUT': {OUT}
+DIR->P43: tipoparam -> 'INOUT': {INOUT}
+DIR->P44: decfun -> 'FUNCTION' IDENT '(' nomparamlist ')' tipo '::' IDENT ';' dec_f_paramlist 'END' 'FUNCTION' IDENT: {FUNCTION}
+DIR->P45: dec_f_paramlist -> tipo ',' 'INTENT' '(' 'IN' ')' IDENT ';' dec_f_paramlist: {INTEGER, REAL, CHARACTER}
+DIR->P46: dec_f_paramlist -> λ: {END, INTEGER, REAL, CHARACTER, IDENT, CALL}
+DIR->P47: sent -> IDENT sent_AUX: {IDENT}
+DIR->P48: sent -> proc_call ';': {CALL}
+DIR->P49: sent_AUX -> '=' exp ';': {=}
+DIR->P50: sent_AUX -> λ: {IDENT, CALL, END}
+DIR->P51: exp -> factor exp_AUX: {NUM_INT_CONST, NUM_REAL_CONST, STRING_CONST, IDENT, (}
+DIR->P52: exp_AUX -> op factor exp_AUX: {+, -, *, /}
+DIR->P53: exp_AUX -> λ: {",", ;, )}
+DIR->P54: op -> '+': {+}
+DIR->P55: op -> '-': {-}
+DIR->P56: op -> '*': {*}
+DIR->P57: op -> '/': {/}
+DIR->P58: factor -> simpvalue: {NUM_INT_CONST, NUM_REAL_CONST, STRING_CONST}
+DIR->P59: factor -> '(' exp ')': {(}
+DIR->P60: factor -> IDENT factor_AUX: {IDENT}
+DIR->P61: factor_AUX -> '(' exp explist ')': {(}
+DIR->P62: factor_AUX -> λ: {+, -, *, /, ",", ;, )}
+DIR->P63: explist -> ',' exp explist: {","}
+DIR->P64: explist -> λ: {)}
+DIR->P65: proc_call -> 'CALL' IDENT subpparamlist: {CALL}
+DIR->P66: subpparamlist -> '(' exp explist ')': {(}
+DIR->P67: subpparamlist -> λ: {;}
+DIR->P68: subproglist -> codproc subproglist: {SUBROUTINE}
+DIR->P69: subproglist -> codfun subproglist: {FUNCTION}
+DIR->P70: subproglist -> λ: {$}
+DIR->P71: codproc -> 'SUBROUTINE' IDENT formal_paramlist dec_s_paramlist dcllist sentlist 'END' 'SUBROUTINE' IDENT: {SUBROUTINE}
+DIR->P72: codfun -> 'FUNCTION' IDENT '(' nomparamlist ')' tipo '::' IDENT ';' dec_f_paramlist dcllist sentlist IDENT '=' exp ';' 'END' 'FUNCTION' IDENT: {FUNCTION}
+
