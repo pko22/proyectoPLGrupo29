@@ -10,77 +10,93 @@ la zona de implementación de funciones y procedimientos(subproglist).
 
 prg : 'PROGRAM' IDENT ';' dcllist cabecera sentlist 'END' 'PROGRAM' IDENT subproglist;
 
+// --- ZONA DE DECLARACIONES ---
+
 dcllist : dcl dcllist | ;
 
-cabecera : 'INTERFACE' cablist 'END' 'INTERFACE' | ;
-cablist : decproc decsubprog | decfun decsubprog;
-decsubprog : decproc decsubprog | decfun decsubprog | ;
-sentlist : sent sentlist_AUX;
-sentlist_AUX : sent sentlist_AUX | ;
+dcl :  tipo dcl_AUX;
+dcl_AUX : defcte | defvar ;
 
-dcl : defcte | defvar;
-defcte : tipo ',' 'PARAMETER' '::' IDENT '=' simpvalue ctelist ';' ;
+defcte : ',' 'PARAMETER' '::' IDENT '=' simpvalue ctelist ';' ;
 ctelist : ',' IDENT '=' simpvalue ctelist | ;
-simpvalue : NUM_INT_CONST | NUM_REAL_CONST | STRING_CONST;
-defvar : tipo '::' varlist ';' ;
+
+defvar : '::' varlist ';' ;
+varlist : IDENT init varlist_AUX;
+varlist_AUX : ',' IDENT init varlist_AUX | ;
+init : '=' simpvalue | ;
 
 tipo : 'INTEGER' | 'REAL' | 'CHARACTER' charlength;
 charlength : '(' NUM_INT_CONST ')' | ;
-varlist : IDENT init varlist_AUX;
+simpvalue : NUM_INT_CONST | NUM_REAL_CONST | STRING_CONST;
 
-varlist_AUX : ',' IDENT init varlist_AUX | ;
+// --- ZONA DE CABECERA (INTERFACE) ---
 
-init : '=' simpvalue | ;
+cabecera : 'INTERFACE' cablist 'END' 'INTERFACE' | ;
+
+cablist : decproc decsubprog | decfun decsubprog;
+
+decsubprog : decproc decsubprog | decfun decsubprog | ;
 
 decproc : 'SUBROUTINE' IDENT formal_paramlist dec_s_paramlist 'END' 'SUBROUTINE' IDENT;
+
+decfun : 'FUNCTION' IDENT '(' nomparamlist ')' tipo '::' IDENT ';' dec_f_paramlist 'END' 'FUNCTION' IDENT;
 
 formal_paramlist : '(' nomparamlist ')' | ;
 
 nomparamlist : IDENT nomparamlist_AUX;
-
 nomparamlist_AUX : ',' IDENT nomparamlist_AUX | ;
 
 dec_s_paramlist : tipo ',' 'INTENT' '(' tipoparam ')' IDENT ';' dec_s_paramlist | ;
+dec_f_paramlist : tipo ',' 'INTENT' '(' 'IN' ')' IDENT ';' dec_f_paramlist | ;
 
 tipoparam : 'IN' | 'OUT' | 'INOUT';
 
-decfun : 'FUNCTION' IDENT '(' nomparamlist ')' tipo '::' IDENT ';' dec_f_paramlist 'END' 'FUNCTION' IDENT;
+// --- ZONA DE SENTENCIAS ---
 
-dec_f_paramlist : tipo ',' 'INTENT' '(' 'IN' ')' IDENT ';' dec_f_paramlist | ;
+sentlist : sent sentlist_AUX;
+sentlist_AUX : sent sentlist_AUX | ;
 
 sent : IDENT sent_AUX | proc_call ';';
-
-sent_AUX : '=' exp ';' | ;
-
-exp : factor exp_AUX;
-
-exp_AUX : op factor exp_AUX | ;
-
-op : '+' | '-' | '*' | '/';
-
-factor : simpvalue | '(' exp ')' | IDENT factor_AUX;
-
-factor_AUX: '(' exp explist ')' | ;
-
-explist : ',' exp explist | ;
+sent_AUX : '=' exp ';';
 
 proc_call : 'CALL' IDENT subpparamlist;
-
 subpparamlist : '(' exp explist ')' | ;
+
+// --- EXPRESIONES ---
+
+exp : termino exp_AUX;
+exp_AUX : operador_sumas termino exp_AUX | ;
+operador_sumas : '+' | '-' ;
+
+termino: factor termino_AUX;
+termino_AUX:operador_multiplicaciones factor termino_AUX | ;
+operador_multiplicaciones : '*' | '/' ;
+
+factor : simpvalue | '(' exp ')' | IDENT factor_AUX;
+factor_AUX: '(' exp explist ')' | ;
+explist : ',' exp explist | ;
+
+// --- IMPLEMENTACIÓN DE SUBPROGRAMAS ---
 
 subproglist : codproc subproglist | codfun subproglist | ;
 
-codproc : 'SUBROUTINE' IDENT formal_paramlist dec_s_paramlist dcllist sentlist 'END' 'SUBROUTINE' IDENT;
+codfun : 'FUNCTION' IDENT '(' nomparamlist ')' tipo '::' IDENT ';' declaracion_mixta_f_list sentlist 'END' 'FUNCTION' IDENT;
+declaracion_mixta_f_list : tipo mixta_f_AUX declaracion_mixta_f_list | ;
+mixta_f_AUX : ',' mixta_f_comma_factor | defvar;
+mixta_f_comma_factor : 'INTENT' '(' 'IN' ')' IDENT ';' | 'PARAMETER' '::' IDENT '=' simpvalue ctelist ';' ;
 
-codfun : 'FUNCTION' IDENT '(' nomparamlist ')' tipo '::' IDENT ';' dec_f_paramlist dcllist sentlist IDENT '=' exp ';' 'END' 'FUNCTION' IDENT;
-
-
+codproc : 'SUBROUTINE' IDENT formal_paramlist declaracion_mixta_list sentlist 'END' 'SUBROUTINE' IDENT;
+declaracion_mixta_list : tipo mixta_AUX declaracion_mixta_list | ;
+mixta_AUX : ',' mixta_comma_factor | defvar;
+mixta_comma_factor : 'INTENT' '(' tipoparam ')' IDENT ';' | 'PARAMETER' '::' IDENT '=' simpvalue ctelist ';' ;
 /*
 Tanto en la declaración de subprogramas (decproc y decfun) como en su implementación
 (codproc y codfun) la declaración de parámetros formales (dec_s_paramlist y
 dec_f_paramlist) se debe realizar en el mismo orden que se mencionan en la cabecera
 (nomparamlist)
 */
+
+// --- COMPONENTES LÉXICOS ---
 
 IDENT : [a-zA-Z] [a-zA-Z0-9_]* ;
 
@@ -91,10 +107,11 @@ NUM_REAL_CONST: PUNTO_FIJO | EXPONENECIAL | MIXTO;
 STRING_CONST: '\'' ('\'\'' | ~['] )* '\'' | '"' ('""' | ~["] )* '"';
 
 WS : [ \t\r\n]+ -> skip ;
-fragment
-    PUNTO_FIJO: NUM_INT_CONST '.' [0-9]+;
-    EXPONENECIAL: NUM_INT_CONST [eE] NUM_INT_CONST;
-    MIXTO: PUNTO_FIJO [eE] NUM_INT_CONST;
+
+fragment PUNTO_FIJO: NUM_INT_CONST '.' [0-9]+;
+fragment EXPONENECIAL: NUM_INT_CONST [eE] NUM_INT_CONST;
+fragment MIXTO: PUNTO_FIJO [eE] NUM_INT_CONST;
+
     /*
     'comilla doble ” dentro'
     'comilla simple '' dentro'
@@ -104,6 +121,7 @@ fragment
     "comilla doble "" dentro"
     "comilla simple ' y doble "" dentro"
     */
+
 /*
 SIGNO: ('+'|'-') ;
 WS : [\n\r\t ]+ -> skip;

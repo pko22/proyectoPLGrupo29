@@ -5,9 +5,10 @@ SIG(dcllist) = CAB'{cabecera} U CAB'{sentlist}={INTERFACE, IDENT, CALL}
 SIG(cabecera) = CAB'{sentlist}={IDENT,CALL}
 SIG(cablist) = {END}
 SIG(decsubprog) = SIG'{cablist}={END}
-SIG(sentlist) = {END,IDENT}
-SIG(sentlist_AUX) = SIG'{sentlist}={END,IDENT}
+SIG(sentlist) = {END}
+SIG(sentlist_AUX) = SIG'{sentlist}={END}
 SIG(dcl) = CAB'{dcllist} U SIG{dcllist}= {INTEGER,REAL,CHARACTER,INTERFACE, IDENT, CALL}
+SIG(dcl_AUX): {INTEGER, REAL, CHARACTER, INTERFACE, IDENT, CALL}
 SIG(defcte) = SIG{dcl}={INTEGER,REAL,CHARACTER,INTERFACE, IDENT, CALL}
 SIG(ctelist) = {;}
 SIG(simpvalue) = CAB'{ctelist} U {;} U SIG{ctelist} U SIG{init} U SIG{factor}={",", ;, ),+,-,*,/}
@@ -18,19 +19,20 @@ SIG(varlist) = {;}
 SIG(varlist_AUX) = SIG{varlist}={;}
 SIG(init) = CAB'{varlist_AUX} U SIG{varlist}={",",;}
 SIG(decproc) = CAB'{decsubprog} U SIG{cablist} U SIG{decsubprog}={SUBROUTINE,FUNCTION,END}
-SIG(formal_paramlist) = CAB'{dec_s_paramlist} U  {END} U CAB'{dcllist} U CAB'{sentlist}=
-                        ={INTEGER,REAL,CHARACTER,END,IDENT, CALL}
+SIG(formal_paramlist) = {INTEGER,REAL,CHARACTER,END,IDENT, CALL}
 SIG(nomparamlist) = {)}
 SIG(nomparamlist_AUX) = SIG{nomparamlist}= {)}
-SIG(dec_s_paramlist) = {END} U CAB'{dcllist} U CAB'{sentlist}= {END,INTEGER,REAL,CHARACTER,IDENT, CALL}
+SIG(dec_s_paramlist) = {END}
 SIG(tipoparam) ={)}
 SIG(decfun) = CAB'{decsubprog} U SIG{cablist} U SIG{decsubprog} ={SUBROUTINE,FUNCTION,END}
-SIG(dec_f_paramlist) = {END} U CAB'{dcllist} U CAB'{sentlist}= {END,INTEGER,REAL,CHARACTER,IDENT, CALL}
-SIG(sent) = CAB'{sentlist_AUX} U SIG{sentlist} U SIG{sentlist_AUX= {IDENT, CALL,END}
+SIG(dec_f_paramlist) = {END}
+SIG(sent) = CAB'{sentlist_AUX} U SIG{sentlist}= {IDENT, CALL,END}
 SIG(sent_AUX) = SIG{sent}= {IDENT, CALL,END}
 SIG(exp) = {;,)} U CAB'{explist} U SIG{explist}={",",;,)}
 SIG(exp_AUX) = SIG{exp}={",",;,)}
-SIG(op) = CAB'{factor}= {NUM_INT_CONST,NUM_REAL_CONST,STRING_CONST,IDENT, (}
+SIG(termino): {+, -, ",", ;, )}
+SIG(termino_AUX): {+, -, ",", ;, )}
+SIG(operador_multiplicaciones): {NUM_INT_CONST, NUM_REAL_CONST, STRING_CONST, IDENT, (}
 SIG(factor) = CAB'{exp_AUX} U SIG{exp} U SIG{exp_AUX}={+,-,*,/,",",;,)}
 SIG(factor_AUX) = SIG{factor}={+,-,*,/,",",;,)}
 
@@ -42,5 +44,12 @@ SIG(proc_call) = {;}
 SIG(subpparamlist) = SIG{poc_call}= {;}
 SIG(subproglist) = SIG{prg}= {$}
 SIG(codproc) = CAB'{subproglist} U SIG{subproglist}= {SUBROUTINE, FUNCTION,$}
+SIG(declaracion_mixta_f_list): {IDENT, CALL}
+SIG(mixta_f_AUX): {INTEGER, REAL, CHARACTER, IDENT, CALL}
+SIG(declaracion_mixta_list): {IDENT, CALL}
+SIG(mixta_AUX): {INTEGER, REAL, CHARACTER, IDENT, CALL}
 SIG(codfun) = CAB'{subproglist} U SIG{subproglist}= {SUBROUTINE, FUNCTION,$}
+
+SIG(mixta_f_comma_factor): {INTEGER, REAL, CHARACTER, IDENT, CALL}
+SIG(mixta_comma_factor): {INTEGER, REAL, CHARACTER, IDENT, CALL}
 

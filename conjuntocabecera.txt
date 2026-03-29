@@ -7,11 +7,12 @@ CAB(cablist) = CAB'{decproc} U CAB'{decfun}={SUBROUTINE,FUNCTION}
 CAB(decsubprog) = CAB'{decproc} U CAB'{decfun} U {λ}={SUBROUTINE,FUNCTION,λ}
 CAB(sentlist) = CAB'{sent}={IDENT, CALL}
 CAB(sentlist_AUX) = CAB'{sent} U {λ}={IDENT, CALL,λ}
-CAB(dcl) = CAB'{defcte} U CAB'{defvar}={INTEGER,REAL,CHARACTER}
-CAB(defcte) = CAB'{tipo}={INTEGER,REAL,CHARACTER}
+CAB(dcl) = CAB'{tipo}={INTEGER,REAL,CHARACTER}
+CAB(dcl_AUX) = {",",::}
+CAB(defcte)={","}
 CAB(ctelist) =  {",",λ}
 CAB(simpvalue) = {NUM_INT_CONST,NUM_REAL_CONST,STRING_CONST}
-CAB(defvar) = CAB'{tipo}={INTEGER,REAL,CHARACTER}
+CAB(defvar) = {::}
 CAB(tipo) = {INTEGER,REAL,CHARACTER}
 CAB(charlength) ={(,λ}
 CAB(varlist) = {IDENT}
@@ -26,10 +27,14 @@ CAB(tipoparam) = {IN,OUT,INOUT}
 CAB(decfun) = {FUNCTION}
 CAB(dec_f_paramlist) ={INTEGER,REAL,CHARACTER,λ}
 CAB(sent) = {IDENT, CALL}
-CAB(sent_AUX) = {"=",λ}
+CAB(sent_AUX) = {"="}
 CAB(exp) = CAB'{factor}={NUM_INT_CONST,NUM_REAL_CONST,STRING_CONST,IDENT, (}
-CAB(exp_AUX) = CAB'{op} U {λ}={+,-,*,/,λ}
-CAB(op) = {+,-,*,/}
+CAB(exp_AUX) ={+,-,λ}
+CAB(operador_sumas) = {+,-}
+CAB{termino}={NUM_INT_CONST, NUM_REAL_CONST, STRING_CONST, '(', IDENT}
+CAB{termino_AUX}={'*', '/', λ}
+CAB(operador_multiplicaciones) = {*,/}
+
 CAB(factor) = CAB'{simpvalue} U {IDENT}= {NUM_INT_CONST,NUM_REAL_CONST,STRING_CONST,IDENT, (}
 CAB(factor_AUX) = {(,λ}
 CAB(explist) ={",",λ}
@@ -37,7 +42,13 @@ CAB(proc_call) = {CALL}
 CAB(subpparamlist) ={(,λ}
 CAB(subproglist) = CAB'{codproc} U CAB'{codfun} U {λ}={SUBROUTINE, FUNCTION, λ}
 CAB(codproc) = {SUBROUTINE}
+CAB(declaracion_mixta_list) = {'INTEGER', 'REAL', 'CHARACTER', λ}
+CAB(mixta_AUX) = {",",::}
+CAB(mixta_comma_factor): {INTENT, PARAMETER}
 CAB(codfun) = {FUNCTION}
+CAB(declaracion_mixta_f_list) = {'INTEGER', 'REAL', 'CHARACTER', λ}
+CAB(mixta_f_comma_factor): {INTENT, PARAMETER}
+CAB(mixta_f_AUX) = {",",::}
 
 
 
