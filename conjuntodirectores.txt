@@ -90,6 +90,6 @@ DIR-P81: codproc -> 'SUBROUTINE' IDENT formal_paramlist declaracion_mixta_list s
 DIR-P82: declaracion_mixta_list -> tipo mixta_AUX declaracion_mixta_list: {INTEGER, REAL, CHARACTER}
 DIR-P83: declaracion_mixta_list -> λ: {IDENT, CALL}
 DIR-P84: mixta_AUX -> ',' mixta_comma_factor: {","}
-DIR-P85: mixta_AUX -> defvar: {::} (Conflicto , resuelto).
+DIR-P85: mixta_AUX -> defvar: {::}
 DIR-P86: mixta_comma_factor -> 'INTENT' '(' tipoparam ')' IDENT ';': {INTENT}
 DIR-P87: mixta_comma_factor -> 'PARAMETER' '::' IDENT '=' simpvalue ctelist ';': {PARAMETER}
