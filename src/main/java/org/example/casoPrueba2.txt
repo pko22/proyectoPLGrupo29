@@ -1,0 +1,15 @@
+PROGRAM prueba2;
+
+! --- ZONA DE DECLARACIONES ---
+! Este comentario debe ser ignorado por el traductor
+INTEGER :: contador = 0;
+REAL :: factor_correccion = 3.1415;
+CHARACTER(20) :: mensaje = 'Hola Mundo';
+CHARACTER(30) :: cita = "Dijo ""esto es una prueba""";
+
+! --- ZONA DE SENTENCIAS ---
+! Los identificadores y operadores aritméticos se mantienen iguales
+contador = contador + 10;
+factor_correccion = factor_correccion / 2.0;
+
+END PROGRAM prueba2

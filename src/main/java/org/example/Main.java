@@ -7,38 +7,37 @@ import org.antlr.v4.runtime.*;
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
     public static void main(String[] args) {
-        try{
-// Preparar el fichero de entrada para asignarlo al analizador léxico
+        try {
+            // 1. Preparar entrada
             CharStream input = CharStreams.fromFileName(args[0]);
-// Crear el objeto correspondiente al analizador léxico con el fichero de
-// entrada
-            calculoCientificoLexer analex = new calculoCientifico(input);
-// Identificar al analizador léxico como fuente de tokens para el
-// sintactico
+            org.example.calculoCientificoToCLexer analex = new org.example.calculoCientificoToCLexer(input);
             CommonTokenStream tokens = new CommonTokenStream(analex);
-// Crear el objeto correspondiente al analizador sintáctico
-            calculoCientificoParser anasint = new calculoCientificoParser(tokens);
-/*
-Si se quiere pasar al analizador algún objeto externo con el que trabajar,
-este deberá ser de una clase del mismo paquete
-Aquí se le llama "sintesis", pero puede ser cualquier nombre.
-NumbersParser anasint = new NumbersParser(tokens, new sintesis());
-*/
-/*
-Comenzar el análisis llamando al axioma de la gramática
-Atención, sustituye "AxiomaDeLaGramatica" por el nombre del axioma de tu
-gramática
-*/
-            anasint.prg();
-        } catch (org.antlr.v4.runtime.RecognitionException e) {
-//Fallo al reconocer la entrada
-            System.err.println("REC " + e.getMessage());
+            org.example.calculoCientificoToCParser anasint = new org.example.calculoCientificoToCParser(tokens);
+
+            // 2. Ejecutar el axioma y capturar el contexto
+            // PrgContext es la clase que genera ANTLR para tu regla 'prg'
+            org.example.calculoCientificoToCParser.PrgContext ctx = anasint.prg();
+
+            // 3. Obtener el atributo sintetizado 'res' que definiste en el .g4
+            String codigoTraducido = ctx.res;
+
+            // 4. Generar el nombre del archivo de salida (.c)
+            // El enunciado dice que si entra 'ejemplo.for' sale 'ejemplo.c' [cite: 175]
+            String nombreEntrada = args[0];
+            String nombreSalida = nombreEntrada.substring(0, nombreEntrada.lastIndexOf('.')) + ".c";
+
+            // 5. Escribir el resultado en el archivo
+            try (PrintWriter writer = new PrintWriter(new FileWriter(nombreSalida))) {
+                writer.print(codigoTraducido);
+                System.out.println("Traducción completada con éxito en: " + nombreSalida);
+
+                System.out.println("--- CÓDIGO TRADUCIDO ---");
+                System.out.println(codigoTraducido);
+                System.out.println("------------------------");
+            }
+
         } catch (IOException e) {
-//Fallo de entrada/salida
-            System.err.println("IO " + e.getMessage());
-        } catch (java.lang.RuntimeException e) {
-//Cualquier otro fallo
-            System.err.println("RUN " + e.getMessage());
+            System.err.println("Error de IO: " + e.getMessage());
         }
     }
 
