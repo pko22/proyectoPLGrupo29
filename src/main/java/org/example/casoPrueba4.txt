@@ -1,0 +1,33 @@
+PROGRAM TestErrores;
+    INTEGER :: resultado;
+
+INTERFACE
+    ! ERROR 1: El nombre de la subrutina no coincide
+    SUBROUTINE mostrar(a)
+        INTEGER, INTENT(IN) a;
+    END SUBROUTINE imprimir
+
+    ! ERROR 2: El nombre de la función no coincide
+    FUNCTION calcular(x)
+        INTEGER :: calcular;
+        INTEGER, INTENT(IN) x;
+    END FUNCTION computar
+END INTERFACE
+
+    CALL mostrar(10);
+    resultado = calcular(5);
+
+END PROGRAM TestErroress
+
+! ERROR 3: El nombre en la implementación tampoco coincide
+SUBROUTINE mostrar(a)
+    INTEGER, INTENT(IN) a;
+    INTEGER :: b = 0;
+END SUBROUTINE otraCosa
+
+! ERROR 4: La funcion no coincide al cerrar
+FUNCTION calcular(x)
+    INTEGER :: calcular;
+    INTEGER, INTENT(IN) x;
+    calcular = x + 2;
+END FUNCTION devuelvoOtraCosa

@@ -1,0 +1,50 @@
+PROGRAM TestCompleto;
+    ! --- 1. ZONA DE CONSTANTES ---
+    INTEGER, PARAMETER :: MAX = 100, MIN = 0;
+    REAL, PARAMETER :: PI = 3.141592;
+    CHARACTER(2), PARAMETER :: SI = "SI", NO = "NO";
+    ! Comprobando el escape de comillas en literales
+    CHARACTER(15), PARAMETER :: MSJ = 'Hola "Mundo"';
+
+    ! --- 2. ZONA DE VARIABLES GLOBALES ---
+    INTEGER :: i = 0, j;
+    REAL :: calc = 0.0;
+    CHARACTER(20) :: texto;
+
+INTERFACE
+    ! --- 3. CABECERAS ---
+    FUNCTION calcularArea(radio)
+        REAL :: calcularArea;
+        REAL, INTENT(IN) radio;
+    END FUNCTION calcularArea
+
+    SUBROUTINE imprimir(val, mensaje)
+        INTEGER, INTENT(IN) val;
+        CHARACTER(15), INTENT(IN) mensaje;
+    END SUBROUTINE imprimir
+END INTERFACE
+
+    ! --- 4. PROGRAMA PRINCIPAL ---
+    j = MAX - MIN;
+    calc = calcularArea(5.5);
+    CALL imprimir(j, MSJ);
+
+END PROGRAM TestCompleto
+
+! --- 5. IMPLEMENTACIONES ---
+FUNCTION calcularArea(radio)
+    REAL :: calcularArea;
+    REAL, INTENT(IN) radio;
+    ! Variable local
+    REAL :: area;
+
+    area = PI * radio * radio;
+    calcularArea = area;
+END FUNCTION calcularArea
+
+SUBROUTINE imprimir(val, mensaje)
+    INTEGER, INTENT(IN) val;
+    CHARACTER(15), INTENT(IN) mensaje;
+    
+    val = val + 1;
+END SUBROUTINE imprimir

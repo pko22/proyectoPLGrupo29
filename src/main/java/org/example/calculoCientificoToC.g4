@@ -9,15 +9,21 @@ la zona de implementación de funciones y procedimientos(subproglist).
 */
 
 @members {
-    // Clase de apoyo para gestionar la lógica de traducción
-    TraductorUtils utils = new TraductorUtils();
+    // Clase de apoyo para gestionar la lógica de traducción de las variables y constantes
+    variablesUtils utils = new variablesUtils();
+
+    // Clase de apoyo para gestionar la lógica de traducción de las funciones y procedimientos
+    subprogramasUtils subprogramasUtils = new subprogramasUtils();
 }
 
 // --- REGLA INICIAL ---
 prg returns [String res] :
     'PROGRAM' id1=IDENT ';' dcllist cabecera sentlist 'END' 'PROGRAM' id2=IDENT subproglist
     {
-        // El orden según el enunciado: Defines -> Cabeceras -> Subprogramas -> Main [cite: 185, 255]
+        if(!$id1.text.equals($id2.text)) {
+            System.err.println("Error sintactico: El nombre del programa no coincide (" + $id1.text + " vs " + $id2.text + ")");
+            System.exit(1); // Aborta la ejecución para NO generar el fichero .c
+        }
         $res = utils.getDefines() + $cabecera.res + $subproglist.res +
                "\nvoid main (void) {\n" +
                $dcllist.res +
@@ -93,9 +99,9 @@ init returns [String res] :
     ;
 
 tipo returns [String res]
-    : 'INTEGER'   { $res = "int"; utils.setDimActual(""); }
-    | 'REAL'      { $res = "float"; utils.setDimActual(""); }
-    | 'CHARACTER' charlength { $res = "char"; utils.setDimActual($charlength.res); }
+    : 'INTEGER'   { $res = "int"; utils.setDimActual(""); subprogramasUtils.setTipoActual("int"); }
+    | 'REAL'      { $res = "float"; utils.setDimActual(""); subprogramasUtils.setTipoActual("float"); }
+    | 'CHARACTER' charlength { $res = "char"; utils.setDimActual($charlength.res); subprogramasUtils.setTipoActual("char"); }
     ;
 
 charlength returns [String res]
@@ -127,13 +133,25 @@ decsubprog returns [String res] :
     ;
 
 decproc returns [String res] :
-    'SUBROUTINE' id1=IDENT formal_paramlist dec_s_paramlist 'END' 'SUBROUTINE' id2=IDENT
-    { $res = "void " + $id1.text + $formal_paramlist.res + ";\n"; }
+    'SUBROUTINE' id1=IDENT { subprogramasUtils.iniciar($id1.text); } formal_paramlist dec_s_paramlist 'END' 'SUBROUTINE' id2=IDENT
+    {
+        if(!$id1.text.equals($id2.text)) {
+            System.err.println("Error sintactico: El nombre en la cabecera de la subrutina no coincide (" + $id1.text + " vs " + $id2.text + ")");
+            System.exit(1); // Aborta
+        }
+        $res = "void " + $id1.text + "(" + subprogramasUtils.generarFirmaC() + ");\n";
+    }
     ;
 
 decfun returns [String res] :
-    'FUNCTION' id1=IDENT '(' nomparamlist ')' tipo '::' id2=IDENT ';' dec_f_paramlist 'END' 'FUNCTION' id3=IDENT
-    { $res = $tipo.res + " " + $id1.text + "(" + $nomparamlist.res + ");\n"; }
+    'FUNCTION' id1=IDENT { subprogramasUtils.iniciar($id1.text); } '(' nomparamlist ')' tipo '::' id2=IDENT ';' dec_f_paramlist 'END' 'FUNCTION' id3=IDENT
+    {
+        if(!$id1.text.equals($id3.text)) {
+            System.err.println("Error sintactico: El nombre en la cabecera de la funcion no coincide (" + $id1.text + " vs " + $id3.text + ")");
+            System.exit(1); // Aborta
+        }
+        $res = $tipo.res + " " + $id1.text + "(" + subprogramasUtils.generarFirmaC() + ");\n";
+    }
     ;
 
 formal_paramlist returns [String res] :
@@ -142,17 +160,20 @@ formal_paramlist returns [String res] :
     ;
 
 nomparamlist returns [String res] :
-    IDENT nomparamlist_AUX { $res = $IDENT.text + $nomparamlist_AUX.res; }
+    IDENT { subprogramasUtils.registrarParametro($IDENT.text); } nomparamlist_AUX
+    { $res = $IDENT.text + $nomparamlist_AUX.res; }
     | { $res = ""; }
     ;
 
 nomparamlist_AUX returns [String res] :
-    ',' IDENT nomparamlist_AUX { $res = ", " + $IDENT.text + $nomparamlist_AUX.res; }
+    ',' IDENT { subprogramasUtils.registrarParametro($IDENT.text); } nomparamlist_AUX
+    { $res = ", " + $IDENT.text + $nomparamlist_AUX.res; }
     | { $res = ""; }
     ;
 
-dec_s_paramlist : tipo ',' 'INTENT' '(' tipoparam ')' IDENT ';' dec_s_paramlist | ;
-dec_f_paramlist : tipo ',' 'INTENT' '(' 'IN' ')' IDENT ';' dec_f_paramlist | ;
+dec_s_paramlist : tipo ',' 'INTENT' '(' tipoparam ')' IDENT ';' { subprogramasUtils.asignarTipo($IDENT.text); } dec_s_paramlist | ;
+dec_f_paramlist : tipo ',' 'INTENT' '(' 'IN' ')' IDENT ';' { subprogramasUtils.asignarTipo($IDENT.text); } dec_f_paramlist | ;
+
 tipoparam : 'IN' | 'OUT' | 'INOUT';
 
 // --- ZONA DE SENTENCIAS ---
@@ -167,12 +188,21 @@ sentlist_AUX returns [String res] :
     ;
 
 sent returns [String res] :
-    IDENT sent_AUX { $res = "\t" + $IDENT.text + $sent_AUX.res; }
+    IDENT sent_AUX
+    {
+        if (subprogramasUtils.esReturn($IDENT.text)) {
+            // Si es la función actual, armamos el return
+            $res = "\treturn " + $sent_AUX.res + ";\n";
+        } else {
+            // Si es una variable normal, armamos la asignación
+            $res = "\t" + $IDENT.text + " = " + $sent_AUX.res + ";\n";
+        }
+    }
     | proc_call ';' { $res = "\t" + $proc_call.res + ";\n"; }
     ;
 
 sent_AUX returns [String res] :
-    '=' exp ';' { $res = " = " + $exp.res + ";\n"; }
+    '=' exp ';' { $res = $exp.res; } // Devolvemos solo la expresión limpia hacia arriba
     ;
 
 proc_call returns [String res]
@@ -233,22 +263,56 @@ subproglist returns [String res] :
     ;
 
 codfun returns [String res] :
-    'FUNCTION' id1=IDENT '(' nomparamlist ')' tipo '::' id2=IDENT ';' declaracion_mixta_f_list sentlist 'END' 'FUNCTION' id3=IDENT
-    { $res = $tipo.res + " " + $id1.text + "(" + $nomparamlist.res + ") {\n" + $sentlist.res + "}\n"; }
+    'FUNCTION' id1=IDENT { subprogramasUtils.iniciar($id1.text); } '(' nomparamlist ')' tipo '::' id2=IDENT ';' declaracion_mixta_f_list sentlist 'END' 'FUNCTION' id3=IDENT
+    {
+        if(!$id1.text.equals($id3.text)) System.err.println("Error sintactico: El nombre de la funcion no coincide en el cierre (" + $id1.text + " vs " + $id3.text + ")");
+        $res = $tipo.res + " " + $id1.text + "(" + subprogramasUtils.generarFirmaC() + ") {\n" + $declaracion_mixta_f_list.res + $sentlist.res + "}\n";
+    }
     ;
-
 codproc returns [String res] :
-    'SUBROUTINE' id1=IDENT formal_paramlist declaracion_mixta_list sentlist 'END' 'SUBROUTINE' id2=IDENT
-    { $res = "void " + $id1.text + $formal_paramlist.res + " {\n" + $sentlist.res + "}\n"; }
+    'SUBROUTINE' id1=IDENT { subprogramasUtils.iniciar($id1.text); } formal_paramlist declaracion_mixta_list sentlist 'END' 'SUBROUTINE' id2=IDENT
+    {
+        if(!$id1.text.equals($id2.text)) System.err.println("Error sintactico: El nombre de la subrutina no coincide en el cierre (" + $id1.text + " vs " + $id2.text + ")");
+        $res = "void " + $id1.text + "(" + subprogramasUtils.generarFirmaC() + ") {\n" + $declaracion_mixta_list.res + $sentlist.res + "}\n";
+    }
     ;
 
-declaracion_mixta_f_list : tipo mixta_f_AUX declaracion_mixta_f_list | ;
-mixta_f_AUX : ',' mixta_f_comma_factor | defvar;
-mixta_f_comma_factor : 'INTENT' '(' 'IN' ')' IDENT ';' | 'PARAMETER' '::' IDENT '=' simpvalue ctelist ';' ;
+declaracion_mixta_f_list returns [String res] :
+    tipo mixta_f_AUX declaracion_mixta_f_list
+    {
+        // Si mixta_f_AUX es un parámetro, devuelve vacío. Si es una variable, unimos tipo + variable.
+        if ($mixta_f_AUX.res.equals("")) {
+            $res = $declaracion_mixta_f_list.res;
+        } else {
+            $res = "\t" + $tipo.res + " " + $mixta_f_AUX.res + $declaracion_mixta_f_list.res;
+        }
+    }
+    | { $res = ""; }
+    ;
+mixta_f_AUX returns [String res] :
+    ',' mixta_f_comma_factor { $res = ""; } // Es un parámetro, no genera texto aquí
+    | defvar { $res = $defvar.res; }        // Es variable local, pasamos su texto
+    ;
+mixta_f_comma_factor : 'INTENT' '(' 'IN' ')' IDENT ';' { subprogramasUtils.asignarTipo($IDENT.text); } | 'PARAMETER' '::' IDENT '=' simpvalue ctelist ';' ;
 
-declaracion_mixta_list : tipo mixta_AUX declaracion_mixta_list | ;
-mixta_AUX : ',' mixta_comma_factor | defvar;
-mixta_comma_factor : 'INTENT' '(' tipoparam ')' IDENT ';' | 'PARAMETER' '::' IDENT '=' simpvalue ctelist ';' ;
+declaracion_mixta_list returns [String res] :
+    tipo mixta_AUX declaracion_mixta_list
+    {
+        if ($mixta_AUX.res.equals("")) {
+            $res = $declaracion_mixta_list.res;
+        } else {
+            $res = "\t" + $tipo.res + " " + $mixta_AUX.res + $declaracion_mixta_list.res;
+        }
+    }
+    | { $res = ""; }
+    ;
+mixta_AUX returns [String res] :
+    ',' mixta_comma_factor { $res = ""; }   // Es un parámetro, no genera texto aquí
+    | defvar { $res = $defvar.res; }        // Es variable local, pasamos su texto
+    ;
+mixta_comma_factor : 'INTENT' '(' tipoparam ')' IDENT ';' { subprogramasUtils.asignarTipo($IDENT.text); } | 'PARAMETER' '::' IDENT '=' simpvalue ctelist ';' ;
+
+
 /*
 Tanto en la declaración de subprogramas (decproc y decfun) como en su implementación
 (codproc y codfun) la declaración de parámetros formales (dec_s_paramlist y

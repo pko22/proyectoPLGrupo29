@@ -1,15 +1,90 @@
-PROGRAM prueba2;
+PROGRAM PruebaFunciones;
+    INTEGER :: resultado;
 
-! --- ZONA DE DECLARACIONES ---
-! Este comentario debe ser ignorado por el traductor
-INTEGER :: contador = 0;
-REAL :: factor_correccion = 3.1415;
-CHARACTER(20) :: mensaje = 'Hola Mundo';
-CHARACTER(30) :: cita = "Dijo ""esto es una prueba""";
+INTERFACE
+    ! Declaracion de subrutina
+    SUBROUTINE mostrar(a)
+        INTEGER, INTENT(IN) a;
+    END SUBROUTINE mostrar
 
-! --- ZONA DE SENTENCIAS ---
-! Los identificadores y operadores aritméticos se mantienen iguales
-contador = contador + 10;
-factor_correccion = factor_correccion / 2.0;
+    ! Declaracion de funcion
+    FUNCTION calcular(x)
+        INTEGER :: calcular;
+        INTEGER, INTENT(IN) x;
+    END FUNCTION calcular
 
-END PROGRAM prueba2
+
+
+
+
+    ! Declaracion de funcion CON parametros
+        FUNCTION fun1 ( a, b )
+             INTEGER :: fun1;
+             INTEGER, INTENT (IN) a;
+             CHARACTER(4), INTENT (IN) b;
+        END FUNCTION fun1
+    ! Declaracion de procedimiento CON parametros
+        SUBROUTINE proc1 ( c, d , e )
+             REAL, INTENT (OUT) c;
+             INTEGER, INTENT (IN) d;
+             INTEGER, INTENT (INOUT) e;
+        END SUBROUTINE proc1
+    ! Declaracion de procedimiento SIN parametros
+        SUBROUTINE proc2
+        END SUBROUTINE proc2
+END INTERFACE
+
+    CALL mostrar(10);
+    resultado = calcular(5);
+
+END PROGRAM PruebaFunciones
+
+! Implementacion de la subrutina
+SUBROUTINE mostrar(a)
+    INTEGER, INTENT(IN) a;
+    INTEGER :: b = 0;
+END SUBROUTINE mostrar
+
+! Implementacion de la funcion
+FUNCTION calcular(x)
+    INTEGER :: calcular;
+    INTEGER, INTENT(IN) x;
+
+    calcular = x + 2;
+END FUNCTION calcular
+
+
+!Implementacion de procedimiento SIN parametros
+SUBROUTINE proc2
+     !...
+     ! Llamada a procedimiento con parametros
+     CALL proc1 ( c, d , e );
+     !...
+END SUBROUTINE proc2
+
+!Implementacion de procedimiento CON parametros
+SUBROUTINE proc1 ( c, d , e )
+     REAL, INTENT (OUT) c;
+     INTEGER, INTENT (IN) d;
+     INTEGER, INTENT (INOUT) e;
+
+
+
+     ! llamada a funcion con parametros
+     c = fun1(d , 1.0);
+
+END SUBROUTINE proc1
+
+
+!Implementacion de funcion CON parametros
+FUNCTION fun1 ( a, b )
+     INTEGER :: fun1;
+     INTEGER, INTENT (IN) a;
+     REAL, INTENT (IN) b;
+
+
+     ! Llamada a procedimiento sin parametros
+     CALL proc2;
+     ! Valor devuelto por fun1
+     fun1 = a * 2;
+END FUNCTION fun1

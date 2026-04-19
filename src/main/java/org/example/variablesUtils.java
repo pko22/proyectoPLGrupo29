@@ -1,6 +1,6 @@
 package org.example;
 
-public class TraductorUtils {
+public class variablesUtils {
     // StringBuilder para los #define (deben ir al principio del fichero .c)
     private StringBuilder listaDefines = new StringBuilder();
     // Variable para transportar la dimensión de los CHARs
