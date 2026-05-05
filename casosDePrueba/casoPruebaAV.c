@@ -3,15 +3,16 @@
 #define c 2e-6
 #define e 2.71828
 #define pi 3.1415
-void ImprimirMensaje(texto);
-int Sumar(a, b);
-void ImprimirMensaje(texto) {
+void ImprimirMensaje(char texto[]);
+int Sumar(int a, int b);
+void ImprimirMensaje(char texto[]) {
 	MostrarEnPantalla(texto);
 }
 
-int Sumar(a, b) {
+int Sumar(int a, int b) {
+	int suma;
 	suma = a + b;
-	Sumar = suma;
+	return suma;
 }
 
 

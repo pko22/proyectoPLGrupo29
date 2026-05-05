@@ -7,7 +7,10 @@ la zona de declaración de funciones y procedimientos (cabecera)
 la zona de sentencias del programa principal (sentlist)
 la zona de implementación de funciones y procedimientos(subproglist).
 */
-
+@header {
+import org.example.variablesUtils;
+import org.example.subprogramasUtils;
+}
 @members {
     // Clase de apoyo para gestionar la lógica de traducción de las variables y constantes
     variablesUtils utils = new variablesUtils();

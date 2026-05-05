@@ -1,5 +1,9 @@
 // Generated from C:/Users/Equipo/Desktop/PL_2/proyectoPLGrupo29/src/main/java/org/example/calculoCientificoToC.g4 by ANTLR 4.13.2
 package org.example;
+
+import org.example.variablesUtils;
+import org.example.subprogramasUtils;
+
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
