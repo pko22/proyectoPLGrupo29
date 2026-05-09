@@ -177,6 +177,54 @@ public interface calculoCientificoToCVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitSent(calculoCientificoToCParser.SentContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link calculoCientificoToCParser#if_tail}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIf_tail(calculoCientificoToCParser.If_tailContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link calculoCientificoToCParser#if_else_tail}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIf_else_tail(calculoCientificoToCParser.If_else_tailContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link calculoCientificoToCParser#do_tail}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDo_tail(calculoCientificoToCParser.Do_tailContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link calculoCientificoToCParser#doval}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDoval(calculoCientificoToCParser.DovalContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link calculoCientificoToCParser#casos}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCasos(calculoCientificoToCParser.CasosContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link calculoCientificoToCParser#etiquetas}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEtiquetas(calculoCientificoToCParser.EtiquetasContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link calculoCientificoToCParser#eti_tail}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEti_tail(calculoCientificoToCParser.Eti_tailContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link calculoCientificoToCParser#listaetiquetas}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitListaetiquetas(calculoCientificoToCParser.ListaetiquetasContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link calculoCientificoToCParser#sent_AUX}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -248,6 +296,36 @@ public interface calculoCientificoToCVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitExplist(calculoCientificoToCParser.ExplistContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link calculoCientificoToCParser#expcond}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExpcond(calculoCientificoToCParser.ExpcondContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link calculoCientificoToCParser#expcond_AUX}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExpcond_AUX(calculoCientificoToCParser.Expcond_AUXContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link calculoCientificoToCParser#oplog}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitOplog(calculoCientificoToCParser.OplogContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link calculoCientificoToCParser#factorcond}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFactorcond(calculoCientificoToCParser.FactorcondContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link calculoCientificoToCParser#opcomp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitOpcomp(calculoCientificoToCParser.OpcompContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link calculoCientificoToCParser#subproglist}.
 	 * @param ctx the parse tree

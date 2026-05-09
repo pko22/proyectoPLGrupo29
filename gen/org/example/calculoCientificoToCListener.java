@@ -282,6 +282,86 @@ public interface calculoCientificoToCListener extends ParseTreeListener {
 	 */
 	void exitSent(calculoCientificoToCParser.SentContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link calculoCientificoToCParser#if_tail}.
+	 * @param ctx the parse tree
+	 */
+	void enterIf_tail(calculoCientificoToCParser.If_tailContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link calculoCientificoToCParser#if_tail}.
+	 * @param ctx the parse tree
+	 */
+	void exitIf_tail(calculoCientificoToCParser.If_tailContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link calculoCientificoToCParser#if_else_tail}.
+	 * @param ctx the parse tree
+	 */
+	void enterIf_else_tail(calculoCientificoToCParser.If_else_tailContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link calculoCientificoToCParser#if_else_tail}.
+	 * @param ctx the parse tree
+	 */
+	void exitIf_else_tail(calculoCientificoToCParser.If_else_tailContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link calculoCientificoToCParser#do_tail}.
+	 * @param ctx the parse tree
+	 */
+	void enterDo_tail(calculoCientificoToCParser.Do_tailContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link calculoCientificoToCParser#do_tail}.
+	 * @param ctx the parse tree
+	 */
+	void exitDo_tail(calculoCientificoToCParser.Do_tailContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link calculoCientificoToCParser#doval}.
+	 * @param ctx the parse tree
+	 */
+	void enterDoval(calculoCientificoToCParser.DovalContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link calculoCientificoToCParser#doval}.
+	 * @param ctx the parse tree
+	 */
+	void exitDoval(calculoCientificoToCParser.DovalContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link calculoCientificoToCParser#casos}.
+	 * @param ctx the parse tree
+	 */
+	void enterCasos(calculoCientificoToCParser.CasosContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link calculoCientificoToCParser#casos}.
+	 * @param ctx the parse tree
+	 */
+	void exitCasos(calculoCientificoToCParser.CasosContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link calculoCientificoToCParser#etiquetas}.
+	 * @param ctx the parse tree
+	 */
+	void enterEtiquetas(calculoCientificoToCParser.EtiquetasContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link calculoCientificoToCParser#etiquetas}.
+	 * @param ctx the parse tree
+	 */
+	void exitEtiquetas(calculoCientificoToCParser.EtiquetasContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link calculoCientificoToCParser#eti_tail}.
+	 * @param ctx the parse tree
+	 */
+	void enterEti_tail(calculoCientificoToCParser.Eti_tailContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link calculoCientificoToCParser#eti_tail}.
+	 * @param ctx the parse tree
+	 */
+	void exitEti_tail(calculoCientificoToCParser.Eti_tailContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link calculoCientificoToCParser#listaetiquetas}.
+	 * @param ctx the parse tree
+	 */
+	void enterListaetiquetas(calculoCientificoToCParser.ListaetiquetasContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link calculoCientificoToCParser#listaetiquetas}.
+	 * @param ctx the parse tree
+	 */
+	void exitListaetiquetas(calculoCientificoToCParser.ListaetiquetasContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link calculoCientificoToCParser#sent_AUX}.
 	 * @param ctx the parse tree
 	 */
@@ -401,6 +481,56 @@ public interface calculoCientificoToCListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitExplist(calculoCientificoToCParser.ExplistContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link calculoCientificoToCParser#expcond}.
+	 * @param ctx the parse tree
+	 */
+	void enterExpcond(calculoCientificoToCParser.ExpcondContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link calculoCientificoToCParser#expcond}.
+	 * @param ctx the parse tree
+	 */
+	void exitExpcond(calculoCientificoToCParser.ExpcondContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link calculoCientificoToCParser#expcond_AUX}.
+	 * @param ctx the parse tree
+	 */
+	void enterExpcond_AUX(calculoCientificoToCParser.Expcond_AUXContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link calculoCientificoToCParser#expcond_AUX}.
+	 * @param ctx the parse tree
+	 */
+	void exitExpcond_AUX(calculoCientificoToCParser.Expcond_AUXContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link calculoCientificoToCParser#oplog}.
+	 * @param ctx the parse tree
+	 */
+	void enterOplog(calculoCientificoToCParser.OplogContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link calculoCientificoToCParser#oplog}.
+	 * @param ctx the parse tree
+	 */
+	void exitOplog(calculoCientificoToCParser.OplogContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link calculoCientificoToCParser#factorcond}.
+	 * @param ctx the parse tree
+	 */
+	void enterFactorcond(calculoCientificoToCParser.FactorcondContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link calculoCientificoToCParser#factorcond}.
+	 * @param ctx the parse tree
+	 */
+	void exitFactorcond(calculoCientificoToCParser.FactorcondContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link calculoCientificoToCParser#opcomp}.
+	 * @param ctx the parse tree
+	 */
+	void enterOpcomp(calculoCientificoToCParser.OpcompContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link calculoCientificoToCParser#opcomp}.
+	 * @param ctx the parse tree
+	 */
+	void exitOpcomp(calculoCientificoToCParser.OpcompContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link calculoCientificoToCParser#subproglist}.
 	 * @param ctx the parse tree

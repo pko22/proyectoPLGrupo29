@@ -116,6 +116,9 @@ simpvalue returns [String res]
      : NUM_INT_CONST  { $res = $NUM_INT_CONST.text; }
      | NUM_REAL_CONST { $res = $NUM_REAL_CONST.text; }
      | STRING_CONST   { $res = utils.normalizarString($STRING_CONST.text); }
+     | NUM_INT_CONST_B { $res = "0b" + $NUM_INT_CONST_B.text.substring(2, $NUM_INT_CONST_B.text.length()-1); }
+     | NUM_INT_CONST_O { $res = "0o" + $NUM_INT_CONST_O.text.substring(2, $NUM_INT_CONST_O.text.length()-1); }
+     | NUM_INT_CONST_H { $res = "0x" + $NUM_INT_CONST_H.text.substring(2, $NUM_INT_CONST_H.text.length()-1); }
      ;
 
 // --- ZONA DE CABECERA (INTERFACE) ---
@@ -202,7 +205,105 @@ sent returns [String res] :
         }
     }
     | proc_call ';' { $res = "\t" + $proc_call.res + ";\n"; }
+
+    // --- NUEVAS SENTENCIAS DE CONTROL DE FLUJO ---
+    | 'IF' '(' expcond ')' if_tail
+    {
+        $res = "\tif (" + $expcond.res + ") " + $if_tail.res;
+    }
+    | 'DO' do_tail
+    {
+        $res = "\t" + $do_tail.res;
+    }
+    | 'SELECT' 'CASE' '(' exp ')' casos 'END' 'SELECT'
+    {
+        $res = "\tswitch (" + $exp.res + ") {\n" + $casos.res + "\t}\n";
+    }
     ;
+
+
+// Reglas auxiliares para el IF (Factorización)
+if_tail returns [String res] :
+    sent { $res = "\n\t" + $sent.res; } // IF de una sola línea
+    | 'THEN' sentlist if_else_tail
+    {
+        $res = "{\n" + $sentlist.res.replace("\t","\t\t") + $if_else_tail.res;
+    }
+    ;
+
+if_else_tail returns [String res] :
+    'ENDIF' { $res = "\t}\n"; }
+    | 'ELSE' sentlist 'ENDIF' { $res = "\t} else {\n" + $sentlist.res.replace("\t","\t\t") + "\t}\n"; }
+    ;
+
+// Reglas auxiliares para el DO (Factorización)
+do_tail returns [String res] :
+    'WHILE' '(' expcond ')' sentlist 'ENDDO'
+    {
+        $res = "while (" + $expcond.res + ") {\n" + $sentlist.res.replace("\t","\t\t") + "\t}\n";
+    }
+    | IDENT '=' ini=doval ',' limite=doval ',' inc=doval sentlist 'ENDDO'
+    {
+        $res = "for(" + $IDENT.text + " = " + $ini.res + "; " + $IDENT.text + " != " + $limite.res + "; " + $IDENT.text + " = " + $IDENT.text + " + " + $inc.res + ") {\n" + $sentlist.res.replace("\t","\t\t") + "\t}\n";
+    }
+    ;
+
+doval returns [String res] :
+    NUM_INT_CONST { $res = $NUM_INT_CONST.text; }
+    | IDENT { $res = $IDENT.text; }
+    ;
+
+
+// --- REGLAS AUXILIARES PARA SELECT CASE ---
+casos returns [String res] :
+    'CASE' '(' etiquetas ')' sentlist casos
+    {
+        // Añadimos el break; a todos los casos normales
+        $res = $etiquetas.res + $sentlist.res.replace("\t", "\t\t\t") + "\t\t\tbreak;\n" + $casos.res;
+    }
+    | 'CASE' 'DEFAULT' sentlist
+    {
+        // El caso por defecto no lleva break;
+        $res = "\t\tdefault:\n" + $sentlist.res.replace("\t", "\t\t\t");
+    }
+    | { $res = ""; }
+    ;
+
+etiquetas returns [String res] :
+    ':' simpvalue
+    {
+        $res = "\t\tcase < " + $simpvalue.res + ":\n";
+    }
+    | simpvalue eti_tail[$simpvalue.res]
+    {
+        $res = $eti_tail.res;
+    }
+    ;
+
+// Recibe el primer valor para evitar ambiguedad y ser LL(1)
+eti_tail [String val] returns [String res] :
+    listaetiquetas
+    {
+        $res = "\t\tcase " + $val + ":\n" + $listaetiquetas.res;
+    }
+    | ':' simpvalue
+    {
+        $res = "\t\tcase " + $val + " to " + $simpvalue.res + ":\n";
+    }
+    | ':'
+    {
+        $res = "\t\tcase > " + $val + ":\n";
+    }
+    ;
+
+listaetiquetas returns [String res] :
+    ',' simpvalue listaetiquetas
+    {
+        $res = "\t\tcase " + $simpvalue.res + ":\n" + $listaetiquetas.res;
+    }
+    | { $res = ""; }
+    ;
+
 
 sent_AUX returns [String res] :
     '=' exp ';' { $res = $exp.res; } // Devolvemos solo la expresión limpia hacia arriba
@@ -257,6 +358,44 @@ explist returns [String res]
     : ',' exp explist { $res = ", " + $exp.res + $explist.res; }
     | { $res = ""; }
     ;
+
+// --- EXPRESIONES CONDICIONALES ---
+expcond returns [String res] :
+    factorcond expcond_AUX { $res = $factorcond.res + $expcond_AUX.res; }
+    ;
+
+expcond_AUX returns [String res] :
+    oplog factorcond expcond_AUX { $res = " " + $oplog.res + " " + $factorcond.res + $expcond_AUX.res; }
+    | { $res = ""; }
+    ;
+
+oplog returns [String res] :
+    OP_OR   { $res = "||"; }
+    | OP_AND  { $res = "&&"; }
+    | OP_EQV  { $res = "=="; }
+    | OP_NEQV { $res = "!="; }
+    ;
+
+factorcond returns [String res] :
+    e1=exp opcomp e2=exp { $res = $e1.res + " " + $opcomp.res + " " + $e2.res; }
+    | '(' expcond ')' { $res = "(" + $expcond.res + ")"; }
+    | OP_NOT factorcond { $res = "!" + $factorcond.res; }
+    | TRUE_CONST { $res = "1"; }
+    | FALSE_CONST { $res = "0"; }
+    ;
+
+opcomp returns [String res] :
+    '<'  { $res = "<"; }
+    | '>'  { $res = ">"; }
+    | '<=' { $res = "<="; }
+    | '>=' { $res = ">="; }
+    | '==' { $res = "=="; }
+    | '/=' { $res = "!="; }
+    ;
+
+
+
+
 
 // --- IMPLEMENTACIÓN DE SUBPROGRAMAS ---
 subproglist returns [String res] :
@@ -326,6 +465,21 @@ dec_f_paramlist) se debe realizar en el mismo orden que se mencionan en la cabec
 // --- COMPONENTES LÉXICOS ---
 IDENT : [a-zA-Z] [a-zA-Z0-9_]* ;
 NUM_INT_CONST: '-'? [0-9]+;
+
+// --- NUEVAS BASES DE NUMEROS DE PARTE OPCIONAL---
+NUM_INT_CONST_B : 'b\'' [01]+ '\'';
+NUM_INT_CONST_O : 'o\'' [0-7]+ '\'';
+NUM_INT_CONST_H : 'z\'' [0-9a-fA-F]+ '\'';
+
+// --- OPERADORES Y CONSTANTES LÓGICAS ---
+TRUE_CONST  : '.TRUE.' ;
+FALSE_CONST : '.FALSE.' ;
+OP_OR       : '.OR.' ;
+OP_AND      : '.AND.' ;
+OP_EQV      : '.EQV.' ;
+OP_NEQV     : '.NEQV.' ;
+OP_NOT      : '.NOT.' ;
+
 NUM_REAL_CONST: PUNTO_FIJO | EXPONENECIAL | MIXTO;
 STRING_CONST: '\'' ('\'\'' | ~['] )* '\'' | '"' ('""' | ~["] )* '"';
 WS : [ \t\r\n]+ -> skip ;
