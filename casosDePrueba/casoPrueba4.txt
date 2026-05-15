@@ -17,7 +17,8 @@ END INTERFACE
     CALL mostrar(10);
     resultado = calcular(5);
 
-END PROGRAM TestErroress
+END PROGRAM TestErrores
+
 
 ! ERROR 3: El nombre en la implementación tampoco coincide
 SUBROUTINE mostrar(a)

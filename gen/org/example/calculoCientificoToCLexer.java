@@ -111,11 +111,9 @@ public class calculoCientificoToCLexer extends Lexer {
 	}
 
 
-	    // Clase de apoyo para gestionar la lógica de traducción de las variables y constantes
 	    variablesUtils utils = new variablesUtils();
-
-	    // Clase de apoyo para gestionar la lógica de traducción de las funciones y procedimientos
 	    subprogramasUtils subprogramasUtils = new subprogramasUtils();
+	    public boolean hayErroresSemanticos = false;
 
 
 	public calculoCientificoToCLexer(CharStream input) {

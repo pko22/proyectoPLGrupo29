@@ -12,11 +12,9 @@ import org.example.variablesUtils;
 import org.example.subprogramasUtils;
 }
 @members {
-    // Clase de apoyo para gestionar la lógica de traducción de las variables y constantes
     variablesUtils utils = new variablesUtils();
-
-    // Clase de apoyo para gestionar la lógica de traducción de las funciones y procedimientos
     subprogramasUtils subprogramasUtils = new subprogramasUtils();
+    public boolean hayErroresSemanticos = false;
 }
 
 // --- REGLA INICIAL ---
@@ -27,7 +25,7 @@ prg returns [String res] :
             System.err.println("Error [Línea " + $id2.getLine() + ", Columna " + $id2.getCharPositionInLine() +
                                "]: Posible causa: El nombre del programa en el cierre ('" + $id2.text +
                                "') no coincide con el de apertura ('" + $id1.text + "').");
-            System.exit(1); // Aborta la ejecución para NO generar el fichero .c
+            hayErroresSemanticos = true;
         }
         $res = utils.getDefines() + $cabecera.res + $subproglist.res +
                "\nvoid main (void) {\n" +
@@ -47,7 +45,7 @@ dcllist returns [String res] :
 dcl returns [String res]:
     tipo dcl_AUX
     {
-         // Si dcl_AUX no devolvió nada, significa que era una constante (defcte)
+        // Si dcl_AUX no devolvió nada, significa que era una constante (defcte)
         // En ese caso, dcl no debe devolver el tipo al main.
         if ($dcl_AUX.res.equals("")) {
              $res = "";
@@ -147,7 +145,7 @@ decproc returns [String res] :
             System.err.println("Error [Línea " + $id2.getLine() + ", Columna " + $id2.getCharPositionInLine() +
                                "]: Posible causa: El nombre de la subrutina en el cierre de la cabecera ('" + $id2.text +
                                "') no coincide con su declaración ('" + $id1.text + "').");
-            System.exit(1);
+            hayErroresSemanticos = true;
         }
         subprogramasUtils.validarParametros();
         $res = "void " + $id1.text + "(" + subprogramasUtils.generarFirmaC() + ");\n";
@@ -161,13 +159,13 @@ decfun returns [String res] :
             System.err.println("Error [Línea " + $id3.getLine() + ", Columna " + $id3.getCharPositionInLine() +
                                "]: Posible causa: El nombre de la funcion en el cierre de la cabecera ('" + $id3.text +
                                "') no coincide con su declaración ('" + $id1.text + "').");
-            System.exit(1);
+            hayErroresSemanticos = true;
         }
         if(!$id1.text.equals($id2.text)) {
             System.err.println("Error [Línea " + $id2.getLine() + ", Columna " + $id2.getCharPositionInLine() +
                                "]: Posible causa: El identificador de la variable de retorno ('" + $id2.text +
                                "') no coincide con el nombre de la funcion ('" + $id1.text + "').");
-            System.exit(1);
+            hayErroresSemanticos = true;
         }
         subprogramasUtils.validarParametros();
         $res = $tipo.res + " " + $id1.text + "(" + subprogramasUtils.generarFirmaC() + ");\n";
@@ -241,7 +239,7 @@ sent returns [String res] :
     ;
 
 
-// Reglas auxiliares para el IF (Factorización)
+// Reglas auxiliares para el IF
 if_tail returns [String res] :
     sent { $res = "\n\t" + $sent.res; } // IF de una sola línea
     | 'THEN' sentlist if_else_tail
@@ -255,7 +253,7 @@ if_else_tail returns [String res] :
     | 'ELSE' sentlist 'ENDIF' { $res = "\t} else {\n" + $sentlist.res.replace("\t","\t\t") + "\t}\n"; }
     ;
 
-// Reglas auxiliares para el DO (Factorización)
+// Reglas auxiliares para el DO
 do_tail returns [String res] :
     'WHILE' '(' expcond ')' sentlist 'ENDDO'
     {
@@ -430,10 +428,6 @@ opcomp returns [String res] :
     | '/=' { $res = "!="; }
     ;
 
-
-
-
-
 // --- IMPLEMENTACIÓN DE SUBPROGRAMAS ---
 subproglist returns [String res] :
     codproc subproglist { $res = $codproc.res + "\n" + $subproglist.res; }
@@ -442,80 +436,53 @@ subproglist returns [String res] :
     ;
 
 codfun returns [String res] :
-    'FUNCTION' id1=IDENT { subprogramasUtils.iniciar($id1.text); } '(' nomparamlist ')' tipo '::' id2=IDENT ';' declaracion_mixta_f_list sentlist 'END' 'FUNCTION' id3=IDENT
+    'FUNCTION' id1=IDENT { subprogramasUtils.iniciar($id1.text); } '(' nomparamlist ')' tipo '::' id2=IDENT ';'
+        dec_f_paramlist
+        dcllist
+        sentlist
+        id_ret=IDENT '=' exp ';'
+        'END' 'FUNCTION' id3=IDENT
     {
+
+        if(!$id1.text.equals($id_ret.text)) {
+            System.err.println("Error [Línea " + $id_ret.getLine() + ", Columna " + $id_ret.getCharPositionInLine() +
+                              "]: Posible causa: El nombre de la subrutina en el cierre de la implementacion ('" + $id_ret.text +
+                              "') no coincide con su declaración ('" + $id1.text + "').");
+            hayErroresSemanticos = true;
+        }
         if(!$id1.text.equals($id3.text)) {
             System.err.println("Error [Línea " + $id3.getLine() + ", Columna " + $id3.getCharPositionInLine() +
                                "]: Posible causa: El nombre de la funcion en el cierre de la implementacion ('" + $id3.text +
                                "') no coincide con su declaración ('" + $id1.text + "').");
-            System.exit(1);
+            hayErroresSemanticos = true;
         }
         if(!$id1.text.equals($id2.text)) {
             System.err.println("Error [Línea " + $id2.getLine() + ", Columna " + $id2.getCharPositionInLine() +
                                "]: Posible causa: El identificador de la variable de retorno en la implementacion ('" + $id2.text +
                                "') no coincide con el nombre de la funcion ('" + $id1.text + "').");
-            System.exit(1);
+            hayErroresSemanticos = true;
         }
         subprogramasUtils.validarParametros();
-        $res = $tipo.res + " " + $id1.text + "(" + subprogramasUtils.generarFirmaC() + ") {\n" + $declaracion_mixta_f_list.res + $sentlist.res + "}\n";
-    }
+        $res = $tipo.res + " " + $id1.text + "(" + subprogramasUtils.generarFirmaC() + ") {\n" + $dcllist.res + $sentlist.res + "\treturn " + $exp.res + ";\n}\n";    }
     ;
 codproc returns [String res] :
-    'SUBROUTINE' id1=IDENT { subprogramasUtils.iniciar($id1.text); } formal_paramlist declaracion_mixta_list sentlist 'END' 'SUBROUTINE' id2=IDENT
+'SUBROUTINE' id1=IDENT { subprogramasUtils.iniciar($id1.text); } formal_paramlist
+    dec_s_paramlist
+    dcllist
+    sentlist
+    'END' 'SUBROUTINE' id2=IDENT
     {
         if(!$id1.text.equals($id2.text)){
             System.err.println("Error [Línea " + $id2.getLine() + ", Columna " + $id2.getCharPositionInLine() +
                                "]: Posible causa: El nombre de la subrutina en el cierre de la implementacion ('" + $id2.text +
                                "') no coincide con su declaración ('" + $id1.text + "').");
-            System.exit(1);
+            hayErroresSemanticos = true;
         }
         subprogramasUtils.validarParametros();
-        $res = "void " + $id1.text + "(" + subprogramasUtils.generarFirmaC() + ") {\n" + $declaracion_mixta_list.res + $sentlist.res + "}\n";
-    }
+        $res = "void " + $id1.text + "(" + subprogramasUtils.generarFirmaC() + ") {\n" + $dcllist.res + $sentlist.res + "}\n";    }
     ;
 
-declaracion_mixta_f_list returns [String res] :
-    tipo mixta_f_AUX declaracion_mixta_f_list
-    {
-        // Si mixta_f_AUX es un parámetro, devuelve vacío. Si es una variable, unimos tipo + variable.
-        if ($mixta_f_AUX.res.equals("")) {
-            $res = $declaracion_mixta_f_list.res;
-        } else {
-            $res = "\t" + $tipo.res + " " + $mixta_f_AUX.res + $declaracion_mixta_f_list.res;
-        }
-    }
-    | { $res = ""; }
-    ;
-mixta_f_AUX returns [String res] :
-    ',' mixta_f_comma_factor { $res = ""; } // Es un parámetro, no genera texto aquí
-    | defvar { $res = $defvar.res; }        // Es variable local, pasamos su texto
-    ;
-mixta_f_comma_factor : 'INTENT' '(' 'IN' ')' IDENT ';' { subprogramasUtils.asignarTipoYModo($IDENT.text, "IN"); } | 'PARAMETER' '::' IDENT '=' simpvalue ctelist ';' ;
 
-declaracion_mixta_list returns [String res] :
-    tipo mixta_AUX declaracion_mixta_list
-    {
-        if ($mixta_AUX.res.equals("")) {
-            $res = $declaracion_mixta_list.res;
-        } else {
-            $res = "\t" + $tipo.res + " " + $mixta_AUX.res + $declaracion_mixta_list.res;
-        }
-    }
-    | { $res = ""; }
-    ;
-mixta_AUX returns [String res] :
-    ',' mixta_comma_factor { $res = ""; }   // Es un parámetro, no genera texto aquí
-    | defvar { $res = $defvar.res; }        // Es variable local, pasamos su texto
-    ;
-mixta_comma_factor : 'INTENT' '(' tipoparam ')' IDENT ';' { subprogramasUtils.asignarTipoYModo($IDENT.text, $tipoparam.res); } | 'PARAMETER' '::' IDENT '=' simpvalue ctelist ';' ;
-
-
-/*
-Tanto en la declaración de subprogramas (decproc y decfun) como en su implementación
-(codproc y codfun) la declaración de parámetros formales (dec_s_paramlist y
-dec_f_paramlist) se debe realizar en el mismo orden que se mencionan en la cabecera
-(nomparamlist)
-*/
 
 // --- COMPONENTES LÉXICOS ---
 IDENT : [a-zA-Z] [a-zA-Z0-9_]* ;
@@ -540,6 +507,7 @@ STRING_CONST: '\'' ('\'\'' | ~['] )* '\'' | '"' ('""' | ~["] )* '"';
 WS : [ \t\r\n]+ -> skip ;
 COMMENT : '!' ~[\n\r]* -> skip ;
 
+// --- CONSTANTES NUMERICAS: ENTERAS/REALES ---
 fragment PUNTO_FIJO: NUM_INT_CONST '.' [0-9]+;
 fragment EXPONENECIAL: NUM_INT_CONST [eE] NUM_INT_CONST;
 fragment MIXTO: PUNTO_FIJO [eE] NUM_INT_CONST;

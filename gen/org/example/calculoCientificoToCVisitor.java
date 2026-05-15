@@ -344,40 +344,4 @@ public interface calculoCientificoToCVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitCodproc(calculoCientificoToCParser.CodprocContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link calculoCientificoToCParser#declaracion_mixta_f_list}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitDeclaracion_mixta_f_list(calculoCientificoToCParser.Declaracion_mixta_f_listContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link calculoCientificoToCParser#mixta_f_AUX}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitMixta_f_AUX(calculoCientificoToCParser.Mixta_f_AUXContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link calculoCientificoToCParser#mixta_f_comma_factor}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitMixta_f_comma_factor(calculoCientificoToCParser.Mixta_f_comma_factorContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link calculoCientificoToCParser#declaracion_mixta_list}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitDeclaracion_mixta_list(calculoCientificoToCParser.Declaracion_mixta_listContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link calculoCientificoToCParser#mixta_AUX}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitMixta_AUX(calculoCientificoToCParser.Mixta_AUXContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link calculoCientificoToCParser#mixta_comma_factor}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitMixta_comma_factor(calculoCientificoToCParser.Mixta_comma_factorContext ctx);
 }
