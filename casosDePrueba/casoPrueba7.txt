@@ -1,0 +1,16 @@
+PROGRAM ErrorLeve;
+
+INTEGER :: contador = 10;
+
+! Error recuperable 1: Token sobrante (extraneous input). Sobra la segunda coma.
+INTEGER :: var1, , var2;
+
+
+! Olvidamos la palabra reservada 'THEN'
+IF (contador > 5)
+    ! Falta el cierre del parentesis
+    var1 = (var1 + var2 ;
+    contador = 0;
+ENDIF
+
+END PROGRAM ErrorLeve

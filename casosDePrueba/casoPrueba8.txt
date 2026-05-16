@@ -1,0 +1,14 @@
+PROGRAM ErrorGrave;
+    INTEGER :: a;
+
+INTERFACE
+    ! Esto es un error estructural grave: una asignacion en la zona de cabeceras
+    a = 10;
+
+    SUBROUTINE testproc
+    END SUBROUTINE testproc
+END INTERFACE
+
+    CALL testproc;
+
+END PROGRAM ErrorGrave

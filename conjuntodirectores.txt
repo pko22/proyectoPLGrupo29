@@ -1,8 +1,8 @@
-DIRECTORES() ------------------------------------------
-ESTRUCTURA GENERAL Y DECLARACIONES
+DIRECTORES()------------------------------------------
+
 DIR-P1: prg -> 'PROGRAM' IDENT ';' dcllist cabecera sentlist 'END' 'PROGRAM' IDENT subproglist: {PROGRAM}
 DIR-P2: dcllist -> dcl dcllist: {INTEGER, REAL, CHARACTER}
-DIR-P3: dcllist -> λ: {INTERFACE, IDENT, CALL}
+DIR-P3: dcllist -> λ: {INTERFACE, IDENT, CALL, IF, DO, SELECT, END}
 DIR-P4: dcl -> tipo dcl_AUX: {INTEGER, REAL, CHARACTER}
 DIR-P5: dcl_AUX -> defcte: {","}
 DIR-P6: dcl_AUX -> defvar: {::}
@@ -23,73 +23,99 @@ DIR-P20: charlength -> λ: {",", ::}
 DIR-P21: simpvalue -> NUM_INT_CONST: {NUM_INT_CONST}
 DIR-P22: simpvalue -> NUM_REAL_CONST: {NUM_REAL_CONST}
 DIR-P23: simpvalue -> STRING_CONST: {STRING_CONST}
-
-ZONA DE CABECERA (INTERFACE)
-DIR-P24: cabecera -> 'INTERFACE' cablist 'END' 'INTERFACE': {INTERFACE}
-DIR-P25: cabecera -> λ: {IDENT, CALL}
-DIR-P26: cablist -> decproc decsubprog: {SUBROUTINE}
-DIR-P27: cablist -> decfun decsubprog: {FUNCTION}
-DIR-P28: decsubprog -> decproc decsubprog: {SUBROUTINE}
-DIR-P29: decsubprog -> decfun decsubprog: {FUNCTION}
-DIR-P30: decsubprog -> λ: {END}
-DIR-P31: decproc -> 'SUBROUTINE' IDENT formal_paramlist dec_s_paramlist 'END' 'SUBROUTINE' IDENT: {SUBROUTINE}
-DIR-P32: decfun -> 'FUNCTION' IDENT '(' nomparamlist ')' tipo '::' IDENT ';' dec_f_paramlist 'END' 'FUNCTION' IDENT: {FUNCTION}
-DIR-P33: formal_paramlist -> '(' nomparamlist ')': {(}
-DIR-P34: formal_paramlist -> λ: {INTEGER, REAL, CHARACTER, END, IDENT, CALL}
-DIR-P35: nomparamlist -> IDENT nomparamlist_AUX: {IDENT}
-DIR-P36: nomparamlist_AUX -> ',' IDENT nomparamlist_AUX: {","}
-DIR-P37: nomparamlist_AUX -> λ: {)}
-DIR-P38: dec_s_paramlist -> tipo ',' 'INTENT' '(' tipoparam ')' IDENT ';' dec_s_paramlist: {INTEGER, REAL, CHARACTER}
-DIR-P39: dec_s_paramlist -> λ: {END}
-DIR-P40: dec_f_paramlist -> tipo ',' 'INTENT' '(' 'IN' ')' IDENT ';' dec_f_paramlist: {INTEGER, REAL, CHARACTER}
-DIR-P41: dec_f_paramlist -> λ: {END}
-DIR-P42: tipoparam -> 'IN': {IN}
-DIR-P43: tipoparam -> 'OUT': {OUT}
-DIR-P44: tipoparam -> 'INOUT': {INOUT}
-
-SENTENCIAS Y EXPRESIONES
-DIR-P45: sentlist -> sent sentlist_AUX: {IDENT, CALL}
-DIR-P46: sentlist_AUX -> sent sentlist_AUX: {IDENT, CALL}
-DIR-P47: sentlist_AUX -> λ: {END}
-DIR-P48: sent -> IDENT sent_AUX: {IDENT}
-DIR-P49: sent -> proc_call ';': {CALL}
-DIR-P50: sent_AUX -> '=' exp ';': {=}
-DIR-P51: proc_call -> 'CALL' IDENT subpparamlist: {CALL}
-DIR-P52: subpparamlist -> '(' exp explist ')': {(}
-DIR-P53: subpparamlist -> λ: {;}
-DIR-P54: exp -> termino exp_AUX: {NUM_INT_CONST, NUM_REAL_CONST, STRING_CONST, IDENT, (}
-DIR-P55: exp_AUX -> operador_sumas termino exp_AUX: {+, -}
-DIR-P56: exp_AUX -> λ: {",", ;, )}
-DIR-P57: operador_sumas -> '+': {+}
-DIR-P58: operador_sumas -> '-': {-}
-DIR-P59: termino -> factor termino_AUX: {NUM_INT_CONST, NUM_REAL_CONST, STRING_CONST, IDENT, (}
-DIR-P60: termino_AUX -> operador_multiplicaciones factor termino_AUX: {*, /}
-DIR-P61: termino_AUX -> λ: {+, -, ",", ;, )}
-DIR-P62: operador_multiplicaciones -> '*': {*}
-DIR-P63: operador_multiplicaciones -> '/': {/}
-DIR-P64: factor -> simpvalue: {NUM_INT_CONST, NUM_REAL_CONST, STRING_CONST}
-DIR-P65: factor -> '(' exp ')': {(}
-DIR-P66: factor -> IDENT factor_AUX: {IDENT}
-DIR-P67: factor_AUX -> '(' exp explist ')': {(}
-DIR-P68: factor_AUX -> λ: {+, -, *, /, ",", ;, )}
-DIR-P69: explist -> ',' exp explist: {","}
-DIR-P70: explist -> λ: {)}
-
-IMPLEMENTACIÓN DE SUBPROGRAMAS
-DIR-P71: subproglist -> codproc subproglist: {SUBROUTINE}
-DIR-P72: subproglist -> codfun subproglist: {FUNCTION}
-DIR-P73: subproglist -> λ: {$}
-DIR-P74: codfun -> 'FUNCTION' IDENT '(' nomparamlist ')' tipo '::' IDENT ';' declaracion_mixta_f_list sentlist 'END' 'FUNCTION' IDENT: {FUNCTION}
-DIR-P75: declaracion_mixta_f_list -> tipo mixta_f_AUX declaracion_mixta_f_list: {INTEGER, REAL, CHARACTER}
-DIR-P76: declaracion_mixta_f_list -> λ: {IDENT, CALL}
-DIR-P77: mixta_f_AUX -> ',' mixta_f_comma_factor: {","}
-DIR-P78: mixta_f_AUX -> defvar: {::}
-DIR-P79: mixta_f_comma_factor -> 'INTENT' '(' 'IN' ')' IDENT ';': {INTENT}
-DIR-P80: mixta_f_comma_factor -> 'PARAMETER' '::' IDENT '=' simpvalue ctelist ';': {PARAMETER}
-DIR-P81: codproc -> 'SUBROUTINE' IDENT formal_paramlist declaracion_mixta_list sentlist 'END' 'SUBROUTINE' IDENT: {SUBROUTINE}
-DIR-P82: declaracion_mixta_list -> tipo mixta_AUX declaracion_mixta_list: {INTEGER, REAL, CHARACTER}
-DIR-P83: declaracion_mixta_list -> λ: {IDENT, CALL}
-DIR-P84: mixta_AUX -> ',' mixta_comma_factor: {","}
-DIR-P85: mixta_AUX -> defvar: {::}
-DIR-P86: mixta_comma_factor -> 'INTENT' '(' tipoparam ')' IDENT ';': {INTENT}
-DIR-P87: mixta_comma_factor -> 'PARAMETER' '::' IDENT '=' simpvalue ctelist ';': {PARAMETER}
+DIR-P24: simpvalue -> NUM_INT_CONST_B: {NUM_INT_CONST_B}
+DIR-P25: simpvalue -> NUM_INT_CONST_O: {NUM_INT_CONST_O}
+DIR-P26: simpvalue -> NUM_INT_CONST_H: {NUM_INT_CONST_H}
+DIR-P27: cabecera -> 'INTERFACE' cablist 'END' 'INTERFACE': {INTERFACE}
+DIR-P28: cabecera -> λ: {IDENT, CALL, IF, DO, SELECT, END}
+DIR-P29: cablist -> decproc decsubprog: {SUBROUTINE}
+DIR-P30: cablist -> decfun decsubprog: {FUNCTION}
+DIR-P31: decsubprog -> decproc decsubprog: {SUBROUTINE}
+DIR-P32: decsubprog -> decfun decsubprog: {FUNCTION}
+DIR-P33: decsubprog -> λ: {END}
+DIR-P34: decproc -> 'SUBROUTINE' IDENT formal_paramlist dec_s_paramlist 'END' 'SUBROUTINE' IDENT: {SUBROUTINE}
+DIR-P35: decfun -> 'FUNCTION' IDENT '(' nomparamlist ')' tipo '::' IDENT ';' dec_f_paramlist 'END' 'FUNCTION' IDENT: {FUNCTION}
+DIR-P36: formal_paramlist -> '(' nomparamlist ')': {(}
+DIR-P37: formal_paramlist -> λ: {INTEGER, REAL, CHARACTER, IDENT, CALL, IF, DO, SELECT, END}
+DIR-P38: nomparamlist -> IDENT nomparamlist_AUX: {IDENT}
+DIR-P39: nomparamlist -> λ: {)}
+DIR-P40: nomparamlist_AUX -> ',' IDENT nomparamlist_AUX: {","}
+DIR-P41: nomparamlist_AUX -> λ: {)}
+DIR-P42: dec_s_paramlist -> tipo ',' 'INTENT' '(' tipoparam ')' IDENT ';' dec_s_paramlist: {INTEGER, REAL, CHARACTER}
+DIR-P43: dec_s_paramlist -> λ: {INTEGER, REAL, CHARACTER, IDENT, CALL, IF, DO, SELECT, END}
+DIR-P44: dec_f_paramlist -> tipo ',' 'INTENT' '(' 'IN' ')' IDENT ';' dec_f_paramlist: {INTEGER, REAL, CHARACTER}
+DIR-P45: dec_f_paramlist -> λ: {INTEGER, REAL, CHARACTER, IDENT, CALL, IF, DO, SELECT}
+DIR-P46: tipoparam -> 'IN': {IN}
+DIR-P47: tipoparam -> 'OUT': {OUT}
+DIR-P48: tipoparam -> 'INOUT': {INOUT}
+DIR-P49: sentlist -> sent sentlist_AUX: {IDENT, CALL, IF, DO, SELECT}
+DIR-P50: sentlist -> λ: {END, IDENT, ENDIF, ELSE, ENDDO, CASE, DEFAULT}
+DIR-P51: sentlist_AUX -> sent sentlist_AUX: {IDENT, CALL, IF, DO, SELECT}
+DIR-P52: sentlist_AUX -> λ: {END, IDENT, ENDIF, ELSE, ENDDO, CASE, DEFAULT}
+DIR-P53: sent -> IDENT sent_AUX: {IDENT}
+DIR-P54: sent -> proc_call ';': {CALL}
+DIR-P55: sent -> 'IF' '(' expcond ')' if_tail: {IF}
+DIR-P56: sent -> 'DO' do_tail: {DO}
+DIR-P57: sent -> 'SELECT' 'CASE' '(' exp ')' casos 'END' 'SELECT': {SELECT}
+DIR-P58: if_tail -> sent: {IDENT, CALL, IF, DO, SELECT}
+DIR-P59: if_tail -> 'THEN' sentlist if_else_tail: {THEN}
+DIR-P60: if_else_tail -> 'ENDIF': {ENDIF}
+DIR-P61: if_else_tail -> 'ELSE' sentlist 'ENDIF': {ELSE}
+DIR-P62: do_tail -> 'WHILE' '(' expcond ')' sentlist 'ENDDO': {WHILE}
+DIR-P63: do_tail -> IDENT '=' doval ',' doval ',' doval sentlist 'ENDDO': {IDENT}
+DIR-P64: doval -> NUM_INT_CONST: {NUM_INT_CONST}
+DIR-P65: doval -> IDENT: {IDENT}
+DIR-P66: casos -> 'CASE' '(' etiquetas ')' sentlist casos: {CASE}
+DIR-P67: casos -> 'CASE' 'DEFAULT' sentlist: {CASE}
+DIR-P68: casos -> λ: {END}
+DIR-P69: etiquetas -> ':' simpvalue: {:}
+DIR-P70: etiquetas -> simpvalue eti_tail: {NUM_INT_CONST, NUM_REAL_CONST, STRING_CONST, NUM_INT_CONST_B, NUM_INT_CONST_O, NUM_INT_CONST_H}
+DIR-P71: eti_tail -> listaetiquetas: {",", )}
+DIR-P72: eti_tail -> ':' simpvalue: {:}
+DIR-P73: eti_tail -> ':': {:}
+DIR-P74: listaetiquetas -> ',' simpvalue listaetiquetas: {","}
+DIR-P75: listaetiquetas -> λ: {)}
+DIR-P76: sent_AUX -> '=' exp ';': {=}
+DIR-P77: proc_call -> 'CALL' IDENT subpparamlist: {CALL}
+DIR-P78: subpparamlist -> '(' exp explist ')': {(}
+DIR-P79: subpparamlist -> λ: {;}
+DIR-P80: exp -> termino exp_AUX: {NUM_INT_CONST, NUM_REAL_CONST, STRING_CONST, NUM_INT_CONST_B, NUM_INT_CONST_O, NUM_INT_CONST_H, (, IDENT}
+DIR-P81: exp_AUX -> operador_sumas termino exp_AUX: {+, -}
+DIR-P82: exp_AUX -> λ: {",", ), ;, <, >, <=, >=, ==, /=}
+DIR-P83: operador_sumas -> '+': {+}
+DIR-P84: operador_sumas -> '-': {-}
+DIR-P85: termino -> factor termino_AUX: {NUM_INT_CONST, NUM_REAL_CONST, STRING_CONST, NUM_INT_CONST_B, NUM_INT_CONST_O, NUM_INT_CONST_H, (, IDENT}
+DIR-P86: termino_AUX -> operador_multiplicaciones factor termino_AUX: {*, /}
+DIR-P87: termino_AUX -> λ: {+, -, ",", ), ;, <, >, <=, >=, ==, /=}
+DIR-P88: operador_multiplicaciones -> '*': {*}
+DIR-P89: operador_multiplicaciones -> '/': {/}
+DIR-P90: factor -> simpvalue: {NUM_INT_CONST, NUM_REAL_CONST, STRING_CONST, NUM_INT_CONST_B, NUM_INT_CONST_O, NUM_INT_CONST_H}
+DIR-P91: factor -> '(' exp ')': {(}
+DIR-P92: factor -> IDENT factor_AUX: {IDENT}
+DIR-P93: factor_AUX -> '(' exp explist ')': {(}
+DIR-P94: factor_AUX -> λ: {*, /, +, -, ",", ), ;, <, >, <=, >=, ==, /=}
+DIR-P95: explist -> ',' exp explist: {","}
+DIR-P96: explist -> λ: {)}
+DIR-P97: expcond -> factorcond expcond_AUX: {NUM_INT_CONST, NUM_REAL_CONST, STRING_CONST, NUM_INT_CONST_B, NUM_INT_CONST_O, NUM_INT_CONST_H, (, IDENT, OP_NOT, TRUE_CONST, FALSE_CONST}
+DIR-P98: expcond_AUX -> oplog factorcond expcond_AUX: {OP_OR, OP_AND, OP_EQV, OP_NEQV}
+DIR-P99: expcond_AUX -> λ: {)}
+DIR-P100: oplog -> OP_OR: {OP_OR}
+DIR-P101: oplog -> OP_AND: {OP_AND}
+DIR-P102: oplog -> OP_EQV: {OP_EQV}
+DIR-P103: oplog -> OP_NEQV: {OP_NEQV}
+DIR-P104: factorcond -> exp opcomp exp: {NUM_INT_CONST, NUM_REAL_CONST, STRING_CONST, NUM_INT_CONST_B, NUM_INT_CONST_O, NUM_INT_CONST_H, (, IDENT}
+DIR-P105: factorcond -> '(' expcond ')': {(}
+DIR-P106: factorcond -> OP_NOT factorcond: {OP_NOT}
+DIR-P107: factorcond -> TRUE_CONST: {TRUE_CONST}
+DIR-P108: factorcond -> FALSE_CONST: {FALSE_CONST}
+DIR-P109: opcomp -> '<': {<}
+DIR-P110: opcomp -> '>': {>}
+DIR-P111: opcomp -> '<=': {<=}
+DIR-P112: opcomp -> '>=': {>=}
+DIR-P113: opcomp -> '==': {==}
+DIR-P114: opcomp -> '/=': {/=}
+DIR-P115: subproglist -> codproc subproglist: {SUBROUTINE}
+DIR-P116: subproglist -> codfun subproglist: {FUNCTION}
+DIR-P117: subproglist -> λ: {$}
+DIR-P118: codfun -> 'FUNCTION' IDENT '(' nomparamlist ')' tipo '::' IDENT ';' dec_f_paramlist dcllist sentlist IDENT '=' exp ';' 'END' 'FUNCTION' IDENT: {FUNCTION}
+DIR-P119: codproc -> 'SUBROUTINE' IDENT formal_paramlist dec_s_paramlist dcllist sentlist 'END' 'SUBROUTINE' IDENT: {SUBROUTINE}

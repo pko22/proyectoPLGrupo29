@@ -1,55 +1,57 @@
 SIGUIENTES()------------------------------------------
 
 SIG(prg) = {$}
-SIG(dcllist) = CAB'{cabecera} U CAB'{sentlist}={INTERFACE, IDENT, CALL}
-SIG(cabecera) = CAB'{sentlist}={IDENT,CALL}
-SIG(cablist) = {END}
-SIG(decsubprog) = SIG'{cablist}={END}
-SIG(sentlist) = {END}
-SIG(sentlist_AUX) = SIG'{sentlist}={END}
-SIG(dcl) = CAB'{dcllist} U SIG{dcllist}= {INTEGER,REAL,CHARACTER,INTERFACE, IDENT, CALL}
-SIG(dcl_AUX): {INTEGER, REAL, CHARACTER, INTERFACE, IDENT, CALL}
-SIG(defcte) = SIG{dcl}={INTEGER,REAL,CHARACTER,INTERFACE, IDENT, CALL}
+SIG(dcllist) = CAB(cabecera) U CAB(sentlist) U {END, IDENT} = {INTERFACE, IDENT, CALL, IF, DO, SELECT, END}
+SIG(dcl) = CAB(dcllist) U SIG(dcllist) = {INTEGER, REAL, CHARACTER, INTERFACE, IDENT, CALL, IF, DO, SELECT, END}
+SIG(dcl_AUX) = SIG(dcl) = {INTEGER, REAL, CHARACTER, INTERFACE, IDENT, CALL, IF, DO, SELECT, END}
+SIG(defcte) = SIG(dcl_AUX) = {INTEGER, REAL, CHARACTER, INTERFACE, IDENT, CALL, IF, DO, SELECT, END}
 SIG(ctelist) = {;}
-SIG(simpvalue) = CAB'{ctelist} U {;} U SIG{ctelist} U SIG{init} U SIG{factor}={",", ;, ),+,-,*,/}
-SIG(defvar) = SIG{dcl}={INTEGER,REAL,CHARACTER,INTERFACE, IDENT, CALL}
-SIG(tipo) = {",",::}
-SIG(charlength) = SIG{tipo}={",",::}
+SIG(defvar) = SIG(dcl_AUX) = {INTEGER, REAL, CHARACTER, INTERFACE, IDENT, CALL, IF, DO, SELECT, END}
 SIG(varlist) = {;}
-SIG(varlist_AUX) = SIG{varlist}={;}
-SIG(init) = CAB'{varlist_AUX} U SIG{varlist}={",",;}
-SIG(decproc) = CAB'{decsubprog} U SIG{cablist} U SIG{decsubprog}={SUBROUTINE,FUNCTION,END}
-SIG(formal_paramlist) = {INTEGER,REAL,CHARACTER,END,IDENT, CALL}
+SIG(varlist_AUX) = {;}
+SIG(init) = CAB(varlist_AUX) U SIG(varlist_AUX) = {",", ;}
+SIG(tipo) = CAB(dcl_AUX) U {",", ::} = {",", ::}
+SIG(charlength) = SIG(tipo) = {",", ::}
+SIG(simpvalue) = {",", ;, *, /, +, -, ), <, >, <=, >=, ==, /=, :, IDENT, CALL, IF, DO, SELECT, CASE, DEFAULT, END}
+SIG(cabecera) = CAB(sentlist) U {END} = {IDENT, CALL, IF, DO, SELECT, END}
+SIG(cablist) = {END}
+SIG(decsubprog) = SIG(cablist) = {END}
+SIG(decproc) = CAB(decsubprog) U SIG(decsubprog) = {SUBROUTINE, FUNCTION, END}
+SIG(decfun) = SIG(decproc) = {SUBROUTINE, FUNCTION, END}
+SIG(formal_paramlist) = CAB(dec_s_paramlist) U CAB(dcllist) U CAB(sentlist) U {END, IDENT} = {INTEGER, REAL, CHARACTER, IDENT, CALL, IF, DO, SELECT, END}
 SIG(nomparamlist) = {)}
-SIG(nomparamlist_AUX) = SIG{nomparamlist}= {)}
-SIG(dec_s_paramlist) = {END}
-SIG(tipoparam) ={)}
-SIG(decfun) = CAB'{decsubprog} U SIG{cablist} U SIG{decsubprog} ={SUBROUTINE,FUNCTION,END}
-SIG(dec_f_paramlist) = {END}
-SIG(sent) = CAB'{sentlist_AUX} U SIG{sentlist}= {IDENT, CALL,END}
-SIG(sent_AUX) = SIG{sent}= {IDENT, CALL,END}
-SIG(exp) = {;,)} U CAB'{explist} U SIG{explist}={",",;,)}
-SIG(exp_AUX) = SIG{exp}={",",;,)}
-SIG(termino): {+, -, ",", ;, )}
-SIG(termino_AUX): {+, -, ",", ;, )}
-SIG(operador_multiplicaciones): {NUM_INT_CONST, NUM_REAL_CONST, STRING_CONST, IDENT, (}
-SIG(factor) = CAB'{exp_AUX} U SIG{exp} U SIG{exp_AUX}={+,-,*,/,",",;,)}
-SIG(factor_AUX) = SIG{factor}={+,-,*,/,",",;,)}
-
-
-
-
-SIG(explist) = {)}
+SIG(nomparamlist_AUX) = {)}
+SIG(dec_s_paramlist) = CAB(dcllist) U CAB(sentlist) U {END} = {INTEGER, REAL, CHARACTER, IDENT, CALL, IF, DO, SELECT, END}
+SIG(dec_f_paramlist) = CAB(dcllist) U CAB(sentlist) U {IDENT} = {INTEGER, REAL, CHARACTER, IDENT, CALL, IF, DO, SELECT}
+SIG(tipoparam) = {)}
+SIG(sentlist) = {END, IDENT, ENDIF, ELSE, ENDDO, CASE, DEFAULT}
+SIG(sentlist_AUX) = SIG(sentlist) = {END, IDENT, ENDIF, ELSE, ENDDO, CASE, DEFAULT}
+SIG(sent) = CAB(sentlist_AUX) U SIG(sentlist) = {IDENT, CALL, IF, DO, SELECT, END, ENDIF, ELSE, ENDDO, CASE, DEFAULT}
+SIG(sent_AUX) = SIG(sent) = {IDENT, CALL, IF, DO, SELECT, END, ENDIF, ELSE, ENDDO, CASE, DEFAULT}
 SIG(proc_call) = {;}
-SIG(subpparamlist) = SIG{poc_call}= {;}
-SIG(subproglist) = SIG{prg}= {$}
-SIG(codproc) = CAB'{subproglist} U SIG{subproglist}= {SUBROUTINE, FUNCTION,$}
-SIG(declaracion_mixta_f_list): {IDENT, CALL}
-SIG(mixta_f_AUX): {INTEGER, REAL, CHARACTER, IDENT, CALL}
-SIG(declaracion_mixta_list): {IDENT, CALL}
-SIG(mixta_AUX): {INTEGER, REAL, CHARACTER, IDENT, CALL}
-SIG(codfun) = CAB'{subproglist} U SIG{subproglist}= {SUBROUTINE, FUNCTION,$}
-
-SIG(mixta_f_comma_factor): {INTEGER, REAL, CHARACTER, IDENT, CALL}
-SIG(mixta_comma_factor): {INTEGER, REAL, CHARACTER, IDENT, CALL}
-
+SIG(subpparamlist) = {;}
+SIG(exp) = {",", ), ;, <, >, <=, >=, ==, /=}
+SIG(exp_AUX) = SIG(exp) = {",", ), ;, <, >, <=, >=, ==, /=}
+SIG(operador_sumas) = CAB(termino) = {NUM_INT_CONST, NUM_REAL_CONST, STRING_CONST, NUM_INT_CONST_B, NUM_INT_CONST_O, NUM_INT_CONST_H, (, IDENT}
+SIG(termino) = CAB(exp_AUX) U SIG(exp) = {+, -, ",", ), ;, <, >, <=, >=, ==, /=}
+SIG(termino_AUX) = SIG(termino) = {+, -, ",", ), ;, <, >, <=, >=, ==, /=}
+SIG(operador_multiplicaciones) = CAB(factor) = {NUM_INT_CONST, NUM_REAL_CONST, STRING_CONST, NUM_INT_CONST_B, NUM_INT_CONST_O, NUM_INT_CONST_H, (, IDENT}
+SIG(factor) = CAB(termino_AUX) U SIG(termino) = {*, /, +, -, ",", ), ;, <, >, <=, >=, ==, /=}
+SIG(factor_AUX) = SIG(factor) = {*, /, +, -, ",", ), ;, <, >, <=, >=, ==, /=}
+SIG(explist) = {)}
+SIG(expcond) = {)}
+SIG(expcond_AUX) = {)}
+SIG(oplog) = CAB(factorcond) = {NUM_INT_CONST, NUM_REAL_CONST, STRING_CONST, NUM_INT_CONST_B, NUM_INT_CONST_O, NUM_INT_CONST_H, (, IDENT, OP_NOT, TRUE_CONST, FALSE_CONST}
+SIG(factorcond) = CAB(expcond_AUX) U SIG(expcond_AUX) = {OP_OR, OP_AND, OP_EQV, OP_NEQV, )}
+SIG(opcomp) = CAB(exp) = {NUM_INT_CONST, NUM_REAL_CONST, STRING_CONST, NUM_INT_CONST_B, NUM_INT_CONST_O, NUM_INT_CONST_H, (, IDENT}
+SIG(if_tail) = SIG(sent) = {IDENT, CALL, IF, DO, SELECT, END, ENDIF, ELSE, ENDDO, CASE, DEFAULT}
+SIG(if_else_tail) = SIG(if_tail) = {IDENT, CALL, IF, DO, SELECT, END, ENDIF, ELSE, ENDDO, CASE, DEFAULT}
+SIG(do_tail) = SIG(sent) = {IDENT, CALL, IF, DO, SELECT, END, ENDIF, ELSE, ENDDO, CASE, DEFAULT}
+SIG(doval) = CAB(sentlist) U {",", ENDDO} = {IDENT, CALL, IF, DO, SELECT, ",", ENDDO}
+SIG(casos) = {END}
+SIG(etiquetas) = {)}
+SIG(eti_tail) = {)}
+SIG(listaetiquetas) = {)}
+SIG(subproglist) = {$}
+SIG(codfun) = CAB(subproglist) U SIG(subproglist) = {SUBROUTINE, FUNCTION, $}
+SIG(codproc) = CAB(subproglist) U SIG(subproglist) = {SUBROUTINE, FUNCTION, $}
