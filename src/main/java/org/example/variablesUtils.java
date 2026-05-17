@@ -25,7 +25,6 @@ public class variablesUtils {
 
 
 
-    //TODO: revisar si esto es asi en el lenguaje final tambien
     /**
      * Transforma strings del lenguaje fuente al formato de C:
      * 1. Delimita siempre con comillas dobles.
